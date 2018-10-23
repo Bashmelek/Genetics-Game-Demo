@@ -9,9 +9,10 @@
 #define GENEDEF
 
 
-enum GeneSection { nogene = -1, targetHeight, eyecolor, maleness, blood, skincolor, targeMuscleMass, targetMuscleTone };
-enum GeneEffect {};
+enum GeneSection { nogene = -1, targetHeight, eyecolor, maleness, blood, skincolor, targetMuscleMass, targetMuscleTone };
+enum GeneEffect { baseHeight, eyeColor, gender, bloodType, skinColor, baseMuscleMass, baseMuscleTone};
 const GeneSection maxGenesection = targetMuscleTone;
+const GeneEffect maxGeneEffect = baseMuscleTone;
 
 
 class Gene
@@ -21,8 +22,9 @@ public:
 	GeneSection geneType;
 
 	int mainFeatureModifier;
+	GeneEffect mainEffect;
 
-	std::map<GeneEffect, int> geneEffects;
+	std::map<GeneEffect, int> otherGeneEffects;
 
 	std::list<int> dominantAgainst;
 	std::list<int> codominantWith;

@@ -17,6 +17,8 @@ enum request { court, marriage, copulate };
 enum requestResponse { no, yes };
 enum responseReaction { accept, reject };
 
+enum geneWinType { noneWin, fatherWin, motherWin, mixWin, bothWin };
+
 class Denizen;
 
 
@@ -75,6 +77,8 @@ public:
 	int monthsGestating;
 	std::list<Denizen*> kidsPregnantWith;
 
+	int alleles[maxGeneEffect];
+
 	////virtual void DrawObject();
 //protected:
 	///*bool isVisibleInWorld;
@@ -93,10 +97,17 @@ public:
 	requestResponse HearRequest(request req, SocialNode * source);
 	int EvaluateAsMate(SocialNode* mate);
 	void ChangeRelationshipWithOther(RelationshipStatus newRelationship, SocialNode * other);
+	int TryToBeBorn();
+	void InitializeRelationships(std::list<std::unique_ptr<Denizen>>* currentLiving);
+	std::wstring BeBorn(std::list<std::unique_ptr<Denizen>>* currentLiving);
+
 protected:
 	void BaseInit();
 	void InitializeRelationships(std::list<std::unique_ptr<Denizen>>* currentLiving, Denizen* father, Denizen* mother);
 	void InitializeSingleRelationship(Denizen* otherGuy, RelationshipStatus whatThisGuyThinks, RelationshipStatus whatOtherGuyThinks);
+
+	void InitializeStarterAlleles();
+	void SetAlleleForGene(Gene* dadgene, Gene* momgene, geneWinType wintype);
 };
 
 

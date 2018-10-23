@@ -162,6 +162,7 @@ Denizen::Denizen(genderEnum gender, std::wstring shortName, int ageMonths, std::
 		courtshipStyle = chaser;
 	}
 	InitializeRelationships(currentLiving, 0, 0);
+	InitializeStarterAlleles();
 }
 
 Denizen::Denizen(Denizen* parent1, Denizen* parent2)
@@ -197,8 +198,16 @@ Denizen::Denizen(Denizen* parent1, Denizen* parent2)
 		(*parent2).monthsPregnant = 0;
 		(*parent2).kidsPregnantWith.push_back(this);
 	}
+	(*this).mother = socialSphere.relationshipTypes[RelationshipStatus::mother].front();
+	(*this).father = socialSphere.relationshipTypes[RelationshipStatus::father].front();
+	InitializeStarterAlleles();
 }
 
+
+void Denizen::InitializeRelationships(std::list<std::unique_ptr<Denizen>>* currentLiving)
+{
+	InitializeRelationships(currentLiving, (*(*this).father).person, (*(*this).mother).person);
+}
 
 void Denizen::InitializeRelationships(std::list<std::unique_ptr<Denizen>>* currentLiving, Denizen* father, Denizen* mother)
 {
@@ -229,10 +238,91 @@ void Denizen::InitializeSingleRelationship(Denizen* otherGuy, RelationshipStatus
 	SocialNode* existingGuysNodeForNewPerson = &((*otherGuy).socialSphere.relationships.back());
 	(*newGuysNodeForExistingPerson).ownerNode = existingGuysNodeForNewPerson;
 	(*existingGuysNodeForNewPerson).ownerNode = newGuysNodeForExistingPerson;
-	(*otherGuy).socialSphere.relationshipTypes[0].push_back(existingGuysNodeForNewPerson);
-	(*this).socialSphere.relationshipTypes[0].push_back(newGuysNodeForExistingPerson);
+	(*otherGuy).socialSphere.relationshipTypes[whatOtherGuyThinks].push_back(existingGuysNodeForNewPerson);
+	(*this).socialSphere.relationshipTypes[whatThisGuyThinks].push_back(newGuysNodeForExistingPerson);
 }
 
+
+void Denizen::InitializeStarterAlleles()
+{
+	for (int c = 0; c < maxGeneEffect; c++)
+	{
+		alleles[c] = -1;
+	}
+
+	for (int i = 0; i < maxGenesection; i++)
+	{
+		geneWinType winType;
+		if (genome.maternalGenes.size() <= i)
+		{
+			i = maxGenesection;
+		}
+		else
+		{
+			Gene* dadGene = genome.paternalGenes[i];
+			Gene* momGene = genome.maternalGenes[i];
+			if ((*momGene).id == 0)
+			{
+				if ((*dadGene).id == 0)
+				{
+					winType = geneWinType::noneWin;
+				}
+				else
+				{
+					winType = geneWinType::fatherWin;
+				}
+			}
+			else if ((*dadGene).id == 0)
+			{
+				winType = geneWinType::motherWin;
+			}
+			else
+			{
+				if (std::find((*dadGene).dominantAgainst.begin(), (*dadGene).dominantAgainst.end(), (*momGene).id) != (*dadGene).dominantAgainst.end())
+				{
+					winType = geneWinType::fatherWin;
+				}
+				else if (std::find((*momGene).dominantAgainst.begin(), (*momGene).dominantAgainst.end(), (*dadGene).id) != (*momGene).dominantAgainst.end())
+				{
+					winType = geneWinType::motherWin;
+				}
+				else//do codominance another day
+				{
+					winType = geneWinType::mixWin;
+				}
+			}
+			SetAlleleForGene(dadGene, momGene, winType);
+		}
+	}
+
+	//yes normally maleness is only determined by the father's genes, but...you never know
+	/*if ((*genome.maternalGenes[maleness]).mainFeatureModifier == 1 || (*genome.paternalGenes[maleness]).mainFeatureModifier == 1)
+	{
+		gender = male;
+	}
+	else
+	{
+		gender = female;
+	}*/
+
+
+}
+
+void Denizen::SetAlleleForGene(Gene* dadgene, Gene* momgene, geneWinType wintype)
+{
+	if (wintype == geneWinType::motherWin)
+	{
+		alleles[(*momgene).mainEffect] = (*momgene).mainFeatureModifier;
+	}
+	else if (wintype == geneWinType::fatherWin)
+	{
+		alleles[(*dadgene).mainEffect] = (*dadgene).mainFeatureModifier;
+	}
+	else if (wintype == geneWinType::mixWin)
+	{
+		alleles[(*dadgene).mainEffect] = ((*dadgene).mainFeatureModifier + (*momgene).mainFeatureModifier) / 2;
+	}
+}
 
 
 bool Denizen::TryHaveChildren(Denizen& partner)
@@ -277,6 +367,43 @@ bool Denizen::TryNaturalDeath()
 		}
 	}
 	return shallExpire;
+}
+
+int Denizen::TryToBeBorn()
+{
+	if (monthsGestating > 11)
+	{
+		return 1;
+	}
+	else if (monthsGestating > 6)
+	{
+		int chanceVar = rand() % 100 + 40;
+		if (chanceVar < ageMonths / 12)
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
+
+std::wstring Denizen::BeBorn(std::list<std::unique_ptr<Denizen>>* currentLiving)
+{
+	monthsGestating = 0;
+	(*(*mother).person).monthsPregnant = 0;
+	(*(*mother).person).isPregnant = false;
+	//must add bit to give birth to all kids being carried
+	(*(*mother).person).kidsPregnantWith.remove(this);
+	InitializeRelationships(currentLiving);
+	shortName = L"Sam";//get name
+
+	worldX = (*(*mother).person).worldX;
+	worldY = (*(*mother).person).worldY + 1;
+
+	isBorn = true;
+	std::wstring birthMessage = shortName;
+	birthMessage.append(L" was born!");
+
+	return birthMessage;
 }
 
 requestResponse Denizen::HearRequest(request req, SocialNode * source)

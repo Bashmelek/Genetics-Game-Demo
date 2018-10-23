@@ -10,6 +10,7 @@ const char NonSpecialSection = '0';
 
 void Genome::InitializeGenome(Genome* dadgenome, Genome* momgenome)
 {
+	srand(time(NULL));
 	std::string specialSectionsContainedOriginally;
 	std::string specialSectionsChosen;
 	int meiosisRandomizer;

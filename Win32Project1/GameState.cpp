@@ -11,6 +11,7 @@ GameState::GameState()
 void GameState::StartNewGame(HWND hwnd)
 {
 	_gameMode = ENTERINGGAME;
+	srand(time(NULL));
 	//float i = cos(1.0);
 	/*if(bio != NULL)
 	{ 
@@ -104,7 +105,22 @@ void GameState::ProcessDenizenActivity()
 	i = theLiving.begin();
 	while(i != theLiving.end())
 	{
-		(*(*i)).ageMonths += 1;
+		if ((*(*i)).isBorn != true)
+		{
+			(*(*i)).monthsGestating += 1;
+			(*(*(*(*i)).mother).person).monthsPregnant += 1;
+			int birthResult = (*(*i)).TryToBeBorn();
+			if (birthResult == 1)
+			{
+				
+				std::wstring birthMessage = (*(*i)).BeBorn(&theLiving);
+				gameMessages.push_back(birthMessage);
+			}
+		}
+		else
+		{
+			(*(*i)).ageMonths += 1;
+		}
 
 		if ( (*(*i)).gender == male )
 		{

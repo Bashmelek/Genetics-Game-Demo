@@ -3,6 +3,7 @@
 
 
 #include "Gene.h"
+#include <time.h>
 #include <vector>
 #include <memory>
 
