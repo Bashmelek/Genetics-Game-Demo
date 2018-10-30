@@ -124,7 +124,7 @@ public:
 				WS_SYSMENU | \
 				WS_MINIMIZEBOX | WS_CLIPCHILDREN
 				/*WS_THICKFRAME*/),
-			100, 200, WINDOWLENGTH, WINDOWHEIGHT, hWndParent, hMenu, hInstance, this);
+			100, 20, WINDOWLENGTH, WINDOWHEIGHT, hWndParent, hMenu, hInstance, this);
 	}
 };
 

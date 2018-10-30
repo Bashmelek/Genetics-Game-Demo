@@ -6,8 +6,8 @@ GameViewState::GameViewState()
 	_gameState = std::make_unique<GameState>();
 	mapViewX = 0;
 	mapViewY = 0;
-	mapWidth = 1200;
-	mapHeight = 1000;
+	mapWidth = 2400;
+	mapHeight = 1800;
 
 	manaBarImage = (HBITMAP)LoadImage(
 		NULL,
@@ -100,11 +100,11 @@ void GameViewState::HandleButtonInput(int buttonID)
 
 		nextTurnButtonWindow = CreateWindowEx(NULL, TEXT("BUTTON"), TEXT("Next Turn"),
 			WS_VISIBLE | WS_CHILD | BS_OWNERDRAW,// | BS_NOTIFY,
-			900, 5, 80, 25,
+			WINDOWLENGTH - 200, 5, 80, 25,
 			mainWindow, (HMENU)BUTTON_NEXTTURN, NULL, NULL);
 
 		_gameMessagesWindow = std::make_unique<GameMessagesWindow>();
-		(*_gameMessagesWindow).Create(L"Learn to Program Windows", WS_OVERLAPPEDWINDOW, 
+		(*_gameMessagesWindow).Create(L"Nothing to see here", WS_OVERLAPPEDWINDOW, 
 				0, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, mainWindow,0);
 
 		break;
@@ -155,12 +155,12 @@ void GameViewState::DrawGameScene(HDC hdc, PAINTSTRUCT ps)
 	HBITMAP selectedBMP = (HBITMAP)SelectObject(memoryDC, screenBMP);
 	//(*GameViewState::TheGameView()).memoryBMP = (HBITMAP)CreateCompatibleBitmap(memoryDC, ps.rcPaint.right, ps.rcPaint.bottom);
 	//HBITMAP screenBMP = (*GameViewState::TheGameView()).memoryBMP;
-	gameViewArea = { ps.rcPaint.right / 5, 40,  4 * ps.rcPaint.right / 5, ps.rcPaint.bottom };
+	gameViewArea = { SIDEBARWIDTH, 40,  WINDOWLENGTH - SIDEBARWIDTH, ps.rcPaint.bottom - DETAILSECTIONHEIGHT + 35};
 	ProcessMousePosition();
 
 	//do the cool game center area
 	HBRUSH brush2 = CreateSolidBrush(RGB(25, 25, 25));
-	RECT gameRect = { ps.rcPaint.right / 5, 0,  4 * ps.rcPaint.right / 5, ps.rcPaint.bottom };
+	RECT gameRect = { SIDEBARWIDTH, 0, WINDOWLENGTH - SIDEBARWIDTH, ps.rcPaint.bottom - DETAILSECTIONHEIGHT + 35};
 	FillRect(memoryDC, &gameRect, brush2);//(RGB(250, 250, 250)));
 	DeleteObject(brush2);
 
@@ -180,14 +180,15 @@ void GameViewState::AnimateUI(HDC memdc, PAINTSTRUCT* paintstruct)
 
 	PAINTSTRUCT ps = (*paintstruct);
 
-	RECT player1Rect = { 4 * ps.rcPaint.right / 5, 0,  ps.rcPaint.right, ps.rcPaint.bottom };
-	RECT enemyRect = { 0, 0,  ps.rcPaint.right / 5,  ps.rcPaint.bottom };
+	RECT player1Rect = { WINDOWLENGTH - SIDEBARWIDTH, 0,  ps.rcPaint.right, ps.rcPaint.bottom };
+	RECT enemyRect = { 0, 0,  SIDEBARWIDTH,  ps.rcPaint.bottom };
 	HBRUSH brush1 = CreateSolidBrush(RGB(0, 32, 61));//RGB(0, 32, 61));
 	FillRect(memoryDC, &enemyRect, brush1);
 	FillRect(memoryDC, &player1Rect, brush1);
 	DeleteObject(brush1);
 
-	RECT TopBarRect = { 0, 0, ps.rcPaint.right, ps.rcPaint.bottom / 12 };
+	RECT TopBarRect = { 0, 0, ps.rcPaint.right, 40 };// ps.rcPaint.bottom / 12};
+
 	HBRUSH interfaceBrush = CreateSolidBrush(RGB(220, 220, 50));
 	FillRect(memdc, &TopBarRect, interfaceBrush);
 	DeleteObject(interfaceBrush);
@@ -239,21 +240,21 @@ void GameViewState::AnimateChildUIWindows()
 	////_gameMessagesWindow
 	HDC otherDC = GetDC((*_gameMessagesWindow).Window());
 	HDC uiMemoryDC = CreateCompatibleDC(otherDC);
-	HBITMAP uiMemoryBMP = (HBITMAP)CreateCompatibleBitmap(otherDC, 700, 700);
+	HBITMAP uiMemoryBMP = (HBITMAP)CreateCompatibleBitmap(otherDC, WINDOWLENGTH - 2 * SIDEBARWIDTH, 700);
 	HBITMAP uiOriginalBMP = (HBITMAP)SelectObject(uiMemoryDC, uiMemoryBMP);
 	//HBITMAP saveTempDCImage = (HBITMAP)SelectObject(uiMemoryDC, manaBarMask);
-	RECT buddyrect = { 5, 5, 700, 700 };
+	RECT buddyrect = { 5, 5, WINDOWLENGTH - 2 * SIDEBARWIDTH, 700 };
 	HBRUSH brush2 = CreateSolidBrush(RGB(200, 200, 200));
 	FillRect(uiMemoryDC, &buddyrect, brush2);
 	std::list<std::wstring>::reverse_iterator it;
 	////int messageCount = 0;
-	RECT messageRect = { 5, 5, 700, 700 };
+	RECT messageRect = { 5, 5, WINDOWLENGTH - 2 * SIDEBARWIDTH, 700 };
 	for (it = (*_gameState).gameMessages.rbegin(); it != (*_gameState).gameMessages.rend(); it++) {
 		DrawText(uiMemoryDC, (*it).c_str(), -1, &messageRect, NULL);
 		messageRect.top += 20;
 		messageRect.bottom += 20;
 	}
-	BitBlt(otherDC, 0, 0, 700, 700, uiMemoryDC, 0, 0, SRCCOPY);
+	BitBlt(otherDC, 0, 0, WINDOWLENGTH - 2 * SIDEBARWIDTH, 700, uiMemoryDC, 0, 0, SRCCOPY);
 	DeleteObject(brush2);
 	ReleaseDC((*_gameMessagesWindow).Window(), otherDC);
 
@@ -383,9 +384,9 @@ void GameViewState::ProcessMousePosition()
 	POINT mousePosition;
 	GetCursorPos(&mousePosition);
 	ScreenToClient(mainWindow, &mousePosition);
-	if (mousePosition.y > 50 && mousePosition.y < 800)
+	if (mousePosition.y > gameViewArea.top && mousePosition.y < 800)
 	{
-		if (mousePosition.x < gameViewArea.left + 20 && mousePosition.x > gameViewArea.left)
+		if (mousePosition.x < gameViewArea.left + 25 && mousePosition.x > gameViewArea.left - 2)
 		{
 			mapViewX -= 4;
 			if (mapViewX < 0)
@@ -393,7 +394,7 @@ void GameViewState::ProcessMousePosition()
 				mapViewX = 0;
 			}
 		}
-		if (mousePosition.x < gameViewArea.right && mousePosition.x > gameViewArea.right - 20)
+		if (mousePosition.x < gameViewArea.right + 2 && mousePosition.x > gameViewArea.right - 25)
 		{
 			mapViewX += 4;
 			if ((mapViewX + gameViewArea.right) > mapWidth)
@@ -404,7 +405,7 @@ void GameViewState::ProcessMousePosition()
 	}
 	if (mousePosition.x > gameViewArea.left && mousePosition.x < gameViewArea.right)
 	{
-		if (mousePosition.y < gameViewArea.top + 20 && mousePosition.y > gameViewArea.top)
+		if (mousePosition.y < gameViewArea.top + 25 && mousePosition.y > gameViewArea.top - 2)
 		{
 			mapViewY -= 4;
 			if (mapViewY < 0)
@@ -412,7 +413,7 @@ void GameViewState::ProcessMousePosition()
 				mapViewY = 0;
 			}
 		}
-		if (mousePosition.y < gameViewArea.bottom && mousePosition.y > gameViewArea.bottom - 20)
+		if (mousePosition.y < gameViewArea.bottom + 2 && mousePosition.y > gameViewArea.bottom - 25)
 		{
 			mapViewY += 4;
 			if ((mapViewY + gameViewArea.bottom) > mapHeight)
