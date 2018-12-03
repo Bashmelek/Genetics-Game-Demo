@@ -40,10 +40,14 @@ class GameViewState
 	private:
 		std::unique_ptr<GameState> _gameState;
 		std::unique_ptr<GameMessagesWindow> _gameMessagesWindow;
+		std::unique_ptr<GameInfoTabsWindow> _gameInfoTabsWindow;
+		int currentGameInfoTab;
 		void DrawGameScene(HDC hdc, PAINTSTRUCT ps);
 		void AnimateWorldFrame();
 		void AnimateUI(HDC hdc, PAINTSTRUCT* ps);
 		void AnimateChildUIWindows();
+		void DrawGameMessagesWindow();
+		void AnimateGameInfoTabsWindow();
 		void DrawObject(Denizen* gameObject);
 		void GameViewState::ProcessMousePosition();
 };

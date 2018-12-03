@@ -1,5 +1,8 @@
-﻿  Denizen.cpp
-c:\users\georg_000\documents\visual studio 2015\projects\winpractice\win32project1\denizen.cpp(256): warning C4018: '<=': signed/unsigned mismatch
-c:\users\georg_000\documents\visual studio 2015\projects\winpractice\win32project1\denizen.cpp(361): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-  Win32Project1.vcxproj -> C:\Users\georg_000\Documents\Visual Studio 2015\Projects\WinPractice\Debug\Win32Project1.exe
-  Win32Project1.vcxproj -> C:\Users\georg_000\Documents\Visual Studio 2015\Projects\WinPractice\Debug\Win32Project1.pdb (Full PDB)
+﻿  GameViewState.cpp
+c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\gameviewstate.cpp(208): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\gameviewstate.cpp(214): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\gameviewstate.cpp(225): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+  GameWindow.cpp
+  Win32Project1.cpp
+  Generating Code...
+  Win32Project1.vcxproj -> C:\Users\gfray\Documents\Visual Studio 2017\Projects\WinPractice\Debug\Win32Project1.exe

@@ -107,6 +107,13 @@ void GameViewState::HandleButtonInput(int buttonID)
 		(*_gameMessagesWindow).Create(L"Nothing to see here", WS_OVERLAPPEDWINDOW, 
 				0, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, mainWindow,0);
 
+		_gameInfoTabsWindow = std::make_unique<GameInfoTabsWindow>();
+		(*_gameInfoTabsWindow).Create(L"Click to see what happens next", WS_OVERLAPPEDWINDOW,
+			0, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, mainWindow, 0);
+		(*_gameInfoTabsWindow).InitInternals();
+
+		currentGameInfoTab = 0;
+
 		break;
 	case BUTTON_EXITGAME:
 		if (MessageBox(mainWindow, L"Really quit?", L"Important notice", MB_OKCANCEL) == IDOK)
@@ -120,6 +127,9 @@ void GameViewState::HandleButtonInput(int buttonID)
 			//DestroyWindow(mainWindow);
 		//}
 		(*_gameState).NextTurn();
+		break;
+	case BUTTON_MESSAGETAB:
+		currentGameInfoTab = 0;
 		break;
 	default:
 		break;
@@ -155,12 +165,12 @@ void GameViewState::DrawGameScene(HDC hdc, PAINTSTRUCT ps)
 	HBITMAP selectedBMP = (HBITMAP)SelectObject(memoryDC, screenBMP);
 	//(*GameViewState::TheGameView()).memoryBMP = (HBITMAP)CreateCompatibleBitmap(memoryDC, ps.rcPaint.right, ps.rcPaint.bottom);
 	//HBITMAP screenBMP = (*GameViewState::TheGameView()).memoryBMP;
-	gameViewArea = { SIDEBARWIDTH, 40,  WINDOWLENGTH - SIDEBARWIDTH, ps.rcPaint.bottom - DETAILSECTIONHEIGHT + 35};
+	gameViewArea = { SIDEBARWIDTH, 40,  WINDOWLENGTH - SIDEBARWIDTH, ps.rcPaint.bottom - DETAILSECTIONHEIGHT + DETAILTABSSECTIONHEIGHT };
 	ProcessMousePosition();
 
 	//do the cool game center area
 	HBRUSH brush2 = CreateSolidBrush(RGB(25, 25, 25));
-	RECT gameRect = { SIDEBARWIDTH, 0, WINDOWLENGTH - SIDEBARWIDTH, ps.rcPaint.bottom - DETAILSECTIONHEIGHT + 35};
+	RECT gameRect = { SIDEBARWIDTH, 0, WINDOWLENGTH - SIDEBARWIDTH, ps.rcPaint.bottom - DETAILSECTIONHEIGHT + DETAILTABSSECTIONHEIGHT };
 	FillRect(memoryDC, &gameRect, brush2);//(RGB(250, 250, 250)));
 	DeleteObject(brush2);
 
@@ -238,26 +248,17 @@ void GameViewState::AnimateChildUIWindows()
 		0L
 	);*/
 	////_gameMessagesWindow
-	HDC otherDC = GetDC((*_gameMessagesWindow).Window());
-	HDC uiMemoryDC = CreateCompatibleDC(otherDC);
-	HBITMAP uiMemoryBMP = (HBITMAP)CreateCompatibleBitmap(otherDC, WINDOWLENGTH - 2 * SIDEBARWIDTH, 700);
-	HBITMAP uiOriginalBMP = (HBITMAP)SelectObject(uiMemoryDC, uiMemoryBMP);
-	//HBITMAP saveTempDCImage = (HBITMAP)SelectObject(uiMemoryDC, manaBarMask);
-	RECT buddyrect = { 5, 5, WINDOWLENGTH - 2 * SIDEBARWIDTH, 700 };
-	HBRUSH brush2 = CreateSolidBrush(RGB(200, 200, 200));
-	FillRect(uiMemoryDC, &buddyrect, brush2);
-	std::list<std::wstring>::reverse_iterator it;
-	////int messageCount = 0;
-	RECT messageRect = { 5, 5, WINDOWLENGTH - 2 * SIDEBARWIDTH, 700 };
-	for (it = (*_gameState).gameMessages.rbegin(); it != (*_gameState).gameMessages.rend(); it++) {
-		DrawText(uiMemoryDC, (*it).c_str(), -1, &messageRect, NULL);
-		messageRect.top += 20;
-		messageRect.bottom += 20;
-	}
-	BitBlt(otherDC, 0, 0, WINDOWLENGTH - 2 * SIDEBARWIDTH, 700, uiMemoryDC, 0, 0, SRCCOPY);
-	DeleteObject(brush2);
-	ReleaseDC((*_gameMessagesWindow).Window(), otherDC);
+	switch (currentGameInfoTab)
+	{
+	case 0:
+		DrawGameMessagesWindow();
+		break;
 
+	default:
+			break;
+	}
+
+	AnimateGameInfoTabsWindow();
 
 	HDC nextTurnButtonDC = GetDC(nextTurnButtonWindow);
 	POINT mousePosition;
@@ -287,13 +288,60 @@ void GameViewState::AnimateChildUIWindows()
 			brush1 = CreateSolidBrush(RGB(0, 0, 200));
 		}
 	}
-	SelectObject(uiMemoryDC, uiOriginalBMP);
 	FillRect(nextTurnButtonDC, &buttRect, brush1);
 	DeleteObject(brush1);
-	DeleteObject(uiMemoryBMP);
-	DeleteDC(uiMemoryDC);
+	
 	ReleaseDC(nextTurnButtonWindow, nextTurnButtonDC);
 }
+
+void GameViewState::DrawGameMessagesWindow()
+{
+	HDC otherDC = GetDC((*_gameMessagesWindow).Window());
+	HDC uiMemoryDC = CreateCompatibleDC(otherDC);
+	HBITMAP uiMemoryBMP = (HBITMAP)CreateCompatibleBitmap(otherDC, WINDOWLENGTH - 2 * SIDEBARWIDTH, 700);
+	HBITMAP uiOriginalBMP = (HBITMAP)SelectObject(uiMemoryDC, uiMemoryBMP);
+	//HBITMAP saveTempDCImage = (HBITMAP)SelectObject(uiMemoryDC, manaBarMask);
+	RECT buddyrect = { 5, 5, WINDOWLENGTH - 2 * SIDEBARWIDTH, 700 };
+	HBRUSH brush2 = CreateSolidBrush(RGB(200, 200, 200));
+	FillRect(uiMemoryDC, &buddyrect, brush2);
+	std::list<std::wstring>::reverse_iterator it;
+	////int messageCount = 0;
+	RECT messageRect = { 5, 5, WINDOWLENGTH - 2 * SIDEBARWIDTH, 700 };
+	for (it = (*_gameState).gameMessages.rbegin(); it != (*_gameState).gameMessages.rend(); it++) {
+		DrawText(uiMemoryDC, (*it).c_str(), -1, &messageRect, NULL);
+		messageRect.top += 20;
+		messageRect.bottom += 20;
+	}
+	BitBlt(otherDC, 0, 0, WINDOWLENGTH - 2 * SIDEBARWIDTH, 700, uiMemoryDC, 0, 0, SRCCOPY);
+	DeleteObject(brush2);
+	ReleaseDC((*_gameMessagesWindow).Window(), otherDC);
+
+	SelectObject(uiMemoryDC, uiOriginalBMP);
+	DeleteObject(uiMemoryBMP);
+	DeleteDC(uiMemoryDC);
+}
+
+void GameViewState::AnimateGameInfoTabsWindow()
+{
+	HDC dc = GetDC((*_gameInfoTabsWindow).Window());
+	HDC tabsMemoryDC = CreateCompatibleDC(dc);
+	HBITMAP uiMemoryBMP = (HBITMAP)CreateCompatibleBitmap(dc, WINDOWLENGTH - 2 * SIDEBARWIDTH, DETAILTABSSECTIONHEIGHT);
+	HBITMAP uiOriginalBMP = (HBITMAP)SelectObject(tabsMemoryDC, uiMemoryBMP);
+	//HBITMAP saveTempDCImage = (HBITMAP)SelectObject(uiMemoryDC, manaBarMask);
+	RECT buddyrect = { 5, 0, WINDOWLENGTH - 2 * SIDEBARWIDTH, DETAILTABSSECTIONHEIGHT };
+	HBRUSH tabBGBrush = CreateSolidBrush(RGB(100, 200, 200));
+	FillRect(tabsMemoryDC, &buddyrect, tabBGBrush);
+	BitBlt(dc, 0, 0, WINDOWLENGTH - 2 * SIDEBARWIDTH, DETAILTABSSECTIONHEIGHT, tabsMemoryDC, 0, 0, SRCCOPY);
+
+	DeleteObject(tabBGBrush);
+
+	SelectObject(tabsMemoryDC, uiOriginalBMP);
+	DeleteObject(uiMemoryBMP);
+	DeleteDC(tabsMemoryDC);
+	ReleaseDC((*_gameInfoTabsWindow).Window(), dc);
+}
+
+
 
 void GameViewState::AnimateWorldFrame()
 {

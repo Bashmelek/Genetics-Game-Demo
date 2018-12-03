@@ -37,6 +37,7 @@ LRESULT MainWindow::HandleMessage(UINT message, WPARAM wParam, LPARAM lParam)
 		case BUTTON_STARTNEWGAME:
 		case BUTTON_EXITGAME:
 		case BUTTON_NEXTTURN:
+		case BUTTON_MESSAGETAB:
 			(*_viewState).HandleButtonInput(wmId);
 			break;
 		case IDM_ABOUT:

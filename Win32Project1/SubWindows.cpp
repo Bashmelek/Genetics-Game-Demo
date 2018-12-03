@@ -3,6 +3,64 @@
 
 
 
+PCWSTR  GameInfoTabsWindow::ClassName() const { return L"Game Info Tabs Window Class"; }
+
+LRESULT GameInfoTabsWindow::HandleMessage(UINT message, WPARAM wParam, LPARAM lParam)
+{
+	int wmId, wmEvent;
+	PAINTSTRUCT ps;
+	HDC hdc;
+
+	switch (message)
+	{
+	case WM_CREATE:
+	{
+		break;
+	}
+	case WM_COMMAND:
+	{
+		int wmId = LOWORD(wParam);
+		// Parse the menu selections:
+		switch (wmId)
+		{
+		case BUTTON_MESSAGETAB:
+			SendMessage( GetParent((*this).Window()), WM_COMMAND, wParam, NULL);
+			break;
+		default:
+			return DefWindowProc(m_hwnd, message, wParam, lParam);
+		}
+	}
+	break;
+	case WM_DRAWITEM:
+	{
+		break;
+	}
+	case WM_VSCROLL:
+		break;
+	case WM_PAINT:
+	{
+		hdc = BeginPaint(Window(), &ps);
+		// TODO: Add any drawing code here...
+		EndPaint(Window(), &ps);
+		break;
+	}
+	default:
+		return DefWindowProc(m_hwnd, message, wParam, lParam);
+	}
+
+	return 0;
+}
+
+void GameInfoTabsWindow::InitInternals()
+{
+	messagesButtonWindow = CreateWindowEx(NULL, TEXT("BUTTON"), TEXT("History"),
+		WS_VISIBLE | WS_CHILD,// | BS_OWNERDRAW,// | BS_NOTIFY,
+		10, 5, 80, 25,
+		(*this).Window(), (HMENU)BUTTON_MESSAGETAB, NULL, NULL);
+}
+
+
+
 PCWSTR  GameMessagesWindow::ClassName() const { return L"Game Message Window Class"; }
 
 WNDPROC GameMessagesWindow::OriginalScrollbarProc = 0;

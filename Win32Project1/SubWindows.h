@@ -16,10 +16,12 @@
 #define WINDOWHEIGHT 1000
 #define SIDEBARWIDTH 280
 #define DETAILSECTIONHEIGHT 290
+#define DETAILTABSSECTIONHEIGHT 35
 
 #define BUTTON_STARTNEWGAME 100
 #define BUTTON_EXITGAME 101
 #define BUTTON_NEXTTURN 102
+#define BUTTON_MESSAGETAB 103
 
 
 
@@ -199,6 +201,26 @@ public:
 		}
 		return 0;
 	}
+};
+
+
+class GameInfoTabsWindow : public SubWindow<GameInfoTabsWindow>
+{
+public:
+	PCWSTR  ClassName() const;
+	LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+	HWND CreateClassWindow(HWND hWndParent, HMENU hMenu, HINSTANCE hInstance)
+	{
+		return CreateWindowEx(0, ClassName(), L"Welcome",
+			(WS_VISIBLE | WS_CHILD | WS_CLIPCHILDREN),
+			SIDEBARWIDTH, WINDOWHEIGHT - DETAILSECTIONHEIGHT - DETAILTABSSECTIONHEIGHT, WINDOWLENGTH - 2 * SIDEBARWIDTH, DETAILTABSSECTIONHEIGHT, hWndParent, hMenu, hInstance, this);
+	}
+
+	void InitInternals();
+
+protected:
+	HWND messagesButtonWindow;
 };
 
 
