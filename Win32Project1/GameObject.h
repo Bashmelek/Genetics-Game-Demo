@@ -3,6 +3,7 @@
 ////#include "GameViewState.h"
 #include <time.h> 
 #include <string>
+#include "WorldMap.h"
 
 #ifndef GAMEOBJDEF
 #define GAMEOBJDEF

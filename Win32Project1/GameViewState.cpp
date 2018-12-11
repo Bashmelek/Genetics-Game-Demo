@@ -8,6 +8,10 @@ GameViewState::GameViewState()
 	mapViewY = 0;
 	mapWidth = 2400;
 	mapHeight = 1800;
+	objectToHighlight = NULL;
+	mouseJustClicked = false;
+	IsOnAutoTime = false;
+	autoTimeProgress = 0;
 
 	manaBarImage = (HBITMAP)LoadImage(
 		NULL,
@@ -52,6 +56,22 @@ GameViewState::GameViewState()
 	manaBarBackgroudImage = (HBITMAP)LoadImage(
 		NULL,
 		L"manabarbg.bmp",////\\GameResources
+		IMAGE_BITMAP,
+		0,
+		0,
+		LR_LOADFROMFILE
+	);
+	defaultHighlightImage = (HBITMAP)LoadImage(
+		NULL,
+		L"dudehighlight.bmp",////\\GameResources
+		IMAGE_BITMAP,
+		0,
+		0,
+		LR_LOADFROMFILE
+	);
+	defaultSelectorImage = (HBITMAP)LoadImage(
+		NULL,
+		L"dudeselected.bmp",////\\GameResources
 		IMAGE_BITMAP,
 		0,
 		0,
@@ -103,8 +123,8 @@ void GameViewState::HandleButtonInput(int buttonID)
 			WINDOWLENGTH - 200, 5, 80, 25,
 			mainWindow, (HMENU)BUTTON_NEXTTURN, NULL, NULL);
 
-		_gameMessagesWindow = std::make_unique<GameMessagesWindow>();
-		(*_gameMessagesWindow).Create(L"Nothing to see here", WS_OVERLAPPEDWINDOW, 
+		_gameInfoWindow = std::make_unique<GameInfoWindow>();
+		(*_gameInfoWindow).Create(L"Nothing to see here", WS_OVERLAPPEDWINDOW,
 				0, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, mainWindow,0);
 
 		_gameInfoTabsWindow = std::make_unique<GameInfoTabsWindow>();
@@ -113,6 +133,8 @@ void GameViewState::HandleButtonInput(int buttonID)
 		(*_gameInfoTabsWindow).InitInternals();
 
 		currentGameInfoTab = 0;
+		////IsOnAutoTime = true;///////////-----------------------------normally shall be FALSE!!!!!!!!!!FAAAALLLSSSEEE!!!
+		autoTimeProgress = 0;
 
 		break;
 	case BUTTON_EXITGAME:
@@ -130,6 +152,9 @@ void GameViewState::HandleButtonInput(int buttonID)
 		break;
 	case BUTTON_MESSAGETAB:
 		currentGameInfoTab = 0;
+		break;
+	case BUTTON_ALLELESTAB:
+		currentGameInfoTab = 1;
 		break;
 	default:
 		break;
@@ -165,7 +190,7 @@ void GameViewState::DrawGameScene(HDC hdc, PAINTSTRUCT ps)
 	HBITMAP selectedBMP = (HBITMAP)SelectObject(memoryDC, screenBMP);
 	//(*GameViewState::TheGameView()).memoryBMP = (HBITMAP)CreateCompatibleBitmap(memoryDC, ps.rcPaint.right, ps.rcPaint.bottom);
 	//HBITMAP screenBMP = (*GameViewState::TheGameView()).memoryBMP;
-	gameViewArea = { SIDEBARWIDTH, 40,  WINDOWLENGTH - SIDEBARWIDTH, ps.rcPaint.bottom - DETAILSECTIONHEIGHT + DETAILTABSSECTIONHEIGHT };
+	gameViewArea = { SIDEBARWIDTH, TOPBARHEIGHT,  WINDOWLENGTH - SIDEBARWIDTH, ps.rcPaint.bottom - DETAILSECTIONHEIGHT + DETAILTABSSECTIONHEIGHT };
 	ProcessMousePosition();
 
 	//do the cool game center area
@@ -197,7 +222,7 @@ void GameViewState::AnimateUI(HDC memdc, PAINTSTRUCT* paintstruct)
 	FillRect(memoryDC, &player1Rect, brush1);
 	DeleteObject(brush1);
 
-	RECT TopBarRect = { 0, 0, ps.rcPaint.right, 40 };// ps.rcPaint.bottom / 12};
+	RECT TopBarRect = { 0, 0, ps.rcPaint.right, TOPBARHEIGHT };// ps.rcPaint.bottom / 12};
 
 	HBRUSH interfaceBrush = CreateSolidBrush(RGB(220, 220, 50));
 	FillRect(memdc, &TopBarRect, interfaceBrush);
@@ -248,15 +273,7 @@ void GameViewState::AnimateChildUIWindows()
 		0L
 	);*/
 	////_gameMessagesWindow
-	switch (currentGameInfoTab)
-	{
-	case 0:
-		DrawGameMessagesWindow();
-		break;
-
-	default:
-			break;
-	}
+	DrawGameInfoWindow();
 
 	AnimateGameInfoTabsWindow();
 
@@ -294,13 +311,37 @@ void GameViewState::AnimateChildUIWindows()
 	ReleaseDC(nextTurnButtonWindow, nextTurnButtonDC);
 }
 
-void GameViewState::DrawGameMessagesWindow()
+void GameViewState::DrawGameInfoWindow()
 {
-	HDC otherDC = GetDC((*_gameMessagesWindow).Window());
+	HDC otherDC = GetDC((*_gameInfoWindow).Window());
 	HDC uiMemoryDC = CreateCompatibleDC(otherDC);
 	HBITMAP uiMemoryBMP = (HBITMAP)CreateCompatibleBitmap(otherDC, WINDOWLENGTH - 2 * SIDEBARWIDTH, 700);
 	HBITMAP uiOriginalBMP = (HBITMAP)SelectObject(uiMemoryDC, uiMemoryBMP);
-	//HBITMAP saveTempDCImage = (HBITMAP)SelectObject(uiMemoryDC, manaBarMask);
+	
+	switch (currentGameInfoTab)
+	{
+	case 0:
+		DrawMessagesInfoGameInfoWindow(uiMemoryDC);
+		break;
+	case 1:
+		DrawAllelesInfoGameInfoWindow(uiMemoryDC);
+		break;
+	default:
+		DrawMessagesInfoGameInfoWindow(uiMemoryDC);
+		break;
+	}
+
+	BitBlt(otherDC, 0, 0, WINDOWLENGTH - 2 * SIDEBARWIDTH, 700, uiMemoryDC, 0, 0, SRCCOPY);
+	
+	ReleaseDC((*_gameInfoWindow).Window(), otherDC);
+
+	SelectObject(uiMemoryDC, uiOriginalBMP);
+	DeleteObject(uiMemoryBMP);
+	DeleteDC(uiMemoryDC);
+}
+
+void GameViewState::DrawMessagesInfoGameInfoWindow(HDC uiMemoryDC)
+{
 	RECT buddyrect = { 5, 5, WINDOWLENGTH - 2 * SIDEBARWIDTH, 700 };
 	HBRUSH brush2 = CreateSolidBrush(RGB(200, 200, 200));
 	FillRect(uiMemoryDC, &buddyrect, brush2);
@@ -312,13 +353,37 @@ void GameViewState::DrawGameMessagesWindow()
 		messageRect.top += 20;
 		messageRect.bottom += 20;
 	}
-	BitBlt(otherDC, 0, 0, WINDOWLENGTH - 2 * SIDEBARWIDTH, 700, uiMemoryDC, 0, 0, SRCCOPY);
 	DeleteObject(brush2);
-	ReleaseDC((*_gameMessagesWindow).Window(), otherDC);
+}
 
-	SelectObject(uiMemoryDC, uiOriginalBMP);
-	DeleteObject(uiMemoryBMP);
-	DeleteDC(uiMemoryDC);
+void GameViewState::DrawAllelesInfoGameInfoWindow(HDC uiMemoryDC)
+{
+	RECT buddyrect = { 5, 5, WINDOWLENGTH - 2 * SIDEBARWIDTH, 700 };
+	HBRUSH brush2 = CreateSolidBrush(RGB(200, 200, 200));
+	FillRect(uiMemoryDC, &buddyrect, brush2);
+	//std::list<std::wstring>::reverse_iterator it;
+	////int messageCount = 0;
+	RECT messageRect = { 5, 5, WINDOWLENGTH - 2 * SIDEBARWIDTH, 700 };
+	//for (it = (*_gameState).gameMessages.rbegin(); it != (*_gameState).gameMessages.rend(); it++) {
+	//	//DrawText(uiMemoryDC, (*it).c_str(), -1, &messageRect, NULL);
+	//	messageRect.top += 20;
+	//	messageRect.bottom += 20;
+	//}
+	if ((*_gameState).selectedPerson != NULL)
+	{
+		DrawText(uiMemoryDC, (*(*_gameState).selectedPerson).shortName.c_str(), -1, &messageRect, NULL);
+		messageRect.top += 20;
+		messageRect.bottom += 20;
+		if ((*(*_gameState).selectedPerson).alleles[eyecolor] == 1)
+		{
+			DrawText(uiMemoryDC, L"blue eyes", -1, &messageRect, NULL);
+		}
+		else
+		{
+			DrawText(uiMemoryDC, L"brown eyes", -1, &messageRect, NULL);
+		}
+	}
+	DeleteObject(brush2);
 }
 
 void GameViewState::AnimateGameInfoTabsWindow()
@@ -403,10 +468,33 @@ void GameViewState::DrawObject(Denizen* gameObject)
 	HDC tempDC = CreateCompatibleDC(memdc);// (hdc);
 										   ////HDC tempDC2 = CreateCompatibleDC(memdc);
 										   //HBITMAP saveOldBitmap = (HBITMAP)SelectObject(memdc, denizenImageBase);
-	int screenLocX = (*gameObject).worldX * 50 + 200 - mapViewX;
-	int screenLocY = (*gameObject).worldY * 50 + 50 - mapViewY;
-	HBITMAP saveOldTempBmp = (HBITMAP)SelectObject(tempDC, (*gameObject).imageMask);
+	int screenLocX = (*gameObject).worldX * 50 - mapViewX + SIDEBARWIDTH;//200
+	int screenLocY = (*gameObject).worldY * 50 - mapViewY + TOPBARHEIGHT + 10;//50
+	HBITMAP saveOldTempBmp = 0;
+	HBITMAP tempBmp;
+	if (gameObject == objectToHighlight)
+	{
+		saveOldTempBmp = (HBITMAP)SelectObject(tempDC, defaultHighlightImage);
+		BitBlt(memdc, screenLocX, screenLocY, 50, 50, tempDC, 0, 0, SRCPAINT);
+	}
+	if (gameObject == ((*_gameState).selectedPerson))
+	{
+		tempBmp = (HBITMAP)SelectObject(tempDC, defaultSelectorImage);
+		if (saveOldTempBmp == 0)
+		{
+			saveOldTempBmp = tempBmp;
+		}
+		BitBlt(memdc, screenLocX, screenLocY, 50, 50, tempDC, 0, 0, SRCPAINT);
+	}
+
+	tempBmp = (HBITMAP)SelectObject(tempDC, (*gameObject).imageMask);
+	if (saveOldTempBmp == 0)
+	{
+		saveOldTempBmp = tempBmp;
+	}
 	BitBlt(memdc, screenLocX, screenLocY, 50, 50, tempDC, ((*gameObject).currentFrame * 50), 0, SRCPAINT);// SRCAND);
+
+	
 	if ((*gameObject).gender == male)
 	{
 		SelectObject(tempDC, (*gameObject).imageBase);
@@ -470,5 +558,50 @@ void GameViewState::ProcessMousePosition()
 			}
 		}
 	}
+
+	//if in game area, go over objects
+	if (mousePosition.y < gameViewArea.bottom && mousePosition.y > gameViewArea.top
+		&& mousePosition.x < gameViewArea.right && mousePosition.x > gameViewArea.left)
+	{
+		ProcessMouseOverGameWorldObjects(mousePosition.x, mousePosition.y);
+	}
 }
+
+
+void GameViewState::ProcessMouseOverGameWorldObjects(int mouseX, int mouseY)
+{
+	(*this).objectToHighlight = NULL;
+	std::list<std::unique_ptr<Denizen>>::iterator i;
+	for (i = (*_gameState).theLiving.begin(); i != (*_gameState).theLiving.end(); i++)
+	{
+		if (IsMouseOverObject(mouseX, mouseY, (*(*i))))
+		{
+			(*this).objectToHighlight = &(*(*i));
+			if (mouseJustClicked)
+			{
+				(*_gameState).selectedPerson = &(*(*i));
+			}
+			break;
+		}
+	}
+	mouseJustClicked = false;
+}
+
+bool GameViewState::IsMouseOverObject(int mouseX, int mouseY, GameObject& gobject)
+{
+	int screenLocLeft = gobject.worldX * 50 - mapViewX + SIDEBARWIDTH;
+	int screenLocRight = screenLocLeft + TOPBARHEIGHT + 10;
+
+	if (mouseX > screenLocLeft && mouseX < screenLocRight)
+	{
+		int screenLocTop = gobject.worldY * 50 + 50 - mapViewY;
+		int screenLocBottom = screenLocTop + 50;
+		if (mouseY > screenLocTop && mouseY < screenLocBottom)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 

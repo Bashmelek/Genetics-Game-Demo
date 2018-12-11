@@ -20,13 +20,6 @@ class GameViewState
 		HBITMAP memoryBMP;
 		static GameViewState* TheGameView();
 		int manaBarFillFrame;
-		HBITMAP manaBarImage;
-		HBITMAP manaBarCoverMask;
-		HBITMAP manaBarMask;
-		HBITMAP manaBarAntiMask;
-		HBITMAP manaBarBackgroudImage;
-		HBITMAP manaBarFillImage;
-		HBITMAP manaBarFillMask;
 
 		void InitIntroScreen(HWND hwnd);
 		void PaintScene(HWND hwnd);
@@ -36,20 +29,42 @@ class GameViewState
 		int mapWidth;
 		int mapHeight;
 		RECT gameViewArea;
+		bool mouseJustClicked;
+
+		bool IsOnAutoTime;
+		int autoTimeProgress;
 
 	private:
 		std::unique_ptr<GameState> _gameState;
-		std::unique_ptr<GameMessagesWindow> _gameMessagesWindow;
+		std::unique_ptr<GameInfoWindow> _gameInfoWindow;
 		std::unique_ptr<GameInfoTabsWindow> _gameInfoTabsWindow;
 		int currentGameInfoTab;
+		GameObject* objectToHighlight;
+
+		HBITMAP defaultHighlightImage;
+		HBITMAP defaultSelectorImage;
+		HBITMAP manaBarImage;
+		HBITMAP manaBarCoverMask;
+		HBITMAP manaBarMask;
+		HBITMAP manaBarAntiMask;
+		HBITMAP manaBarBackgroudImage;
+		HBITMAP manaBarFillImage;
+		HBITMAP manaBarFillMask;
+
 		void DrawGameScene(HDC hdc, PAINTSTRUCT ps);
 		void AnimateWorldFrame();
 		void AnimateUI(HDC hdc, PAINTSTRUCT* ps);
 		void AnimateChildUIWindows();
-		void DrawGameMessagesWindow();
+		void DrawGameInfoWindow();
 		void AnimateGameInfoTabsWindow();
 		void DrawObject(Denizen* gameObject);
-		void GameViewState::ProcessMousePosition();
+		void ProcessMousePosition();
+
+		void DrawMessagesInfoGameInfoWindow(HDC uiMemoryDC);
+		void DrawAllelesInfoGameInfoWindow(HDC uiMemoryDC);
+
+		void ProcessMouseOverGameWorldObjects(int mouseX, int mouseY);
+		bool IsMouseOverObject(int mouseX, int mouseY, GameObject& gobject);
 };
 
 

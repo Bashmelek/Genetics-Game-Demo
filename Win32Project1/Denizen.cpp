@@ -201,6 +201,15 @@ Denizen::Denizen(Denizen* parent1, Denizen* parent2)
 	(*this).mother = socialSphere.relationshipTypes[RelationshipStatus::mother].front();
 	(*this).father = socialSphere.relationshipTypes[RelationshipStatus::father].front();
 	InitializeStarterAlleles();
+
+	if (alleles[maleness] == 1)
+	{
+		gender = male;
+	}
+	else
+	{
+		gender = female;
+	}
 }
 
 
@@ -342,7 +351,7 @@ bool Denizen::TryHaveChildren(Denizen& partner)
 
 	if (ageMonths / 12 < 49 && ageMonths / 12 > 14 && 
 		partner.ageMonths / 12 < 49 && partner.ageMonths / 12 > 14 &&
-		(rand() % 4) == 0)
+		(rand() % 3) == 0)
 	{
 		return true;
 	}
@@ -389,12 +398,28 @@ int Denizen::TryToBeBorn()
 std::wstring Denizen::BeBorn(std::list<std::unique_ptr<Denizen>>* currentLiving)
 {
 	monthsGestating = 0;
+	ageMonths = 0;
 	(*(*mother).person).monthsPregnant = 0;
 	(*(*mother).person).isPregnant = false;
 	//must add bit to give birth to all kids being carried
 	(*(*mother).person).kidsPregnantWith.remove(this);
 	InitializeRelationships(currentLiving);
-	shortName = L"Sam";//get name
+	if (gender == male)
+	{
+		shortName = L"Sam";//get name
+	}
+	else
+	{
+		shortName = L"Sally";
+	}
+	if (gender == female)
+	{
+		courtshipStyle = beingChased;
+	}
+	else
+	{
+		courtshipStyle = chaser;
+	}
 
 	worldX = (*(*mother).person).worldX;
 	worldY = (*(*mother).person).worldY + 1;

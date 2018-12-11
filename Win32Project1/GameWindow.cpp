@@ -38,6 +38,7 @@ LRESULT MainWindow::HandleMessage(UINT message, WPARAM wParam, LPARAM lParam)
 		case BUTTON_EXITGAME:
 		case BUTTON_NEXTTURN:
 		case BUTTON_MESSAGETAB:
+		case BUTTON_ALLELESTAB:
 			(*_viewState).HandleButtonInput(wmId);
 			break;
 		case IDM_ABOUT:
@@ -64,6 +65,16 @@ LRESULT MainWindow::HandleMessage(UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		//int xStart = (*GameViewState::TheGameView()).mapViewX;
 		(*_viewState).DrawNextFrame(m_hwnd);
+		//here is the rough autorun logic, spoofing commands...must clean up
+		if ((*_viewState).IsOnAutoTime)
+		{
+			(*_viewState).autoTimeProgress += 1;
+			if ((*_viewState).autoTimeProgress % 7 == 0)
+			{
+				(*_viewState).autoTimeProgress = 0;
+				(*_viewState).HandleButtonInput(BUTTON_NEXTTURN);
+			}
+		}
 		break;
 	}
 	case WM_PAINT:
@@ -79,6 +90,10 @@ LRESULT MainWindow::HandleMessage(UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
+		break;
+	case WM_LBUTTONDOWN:
+		(*_viewState).mouseJustClicked = true;
+		DefWindowProc(m_hwnd, message, wParam, lParam);
 		break;
 	default:
 		return DefWindowProc(m_hwnd, message, wParam, lParam);

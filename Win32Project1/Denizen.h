@@ -1,9 +1,8 @@
 #pragma once
 
-#include "GameObject.h"
 #include <list>
-#include <memory>
 #include "Genome.h"
+#include "GameObject.h"
 /////#include "SocialSphere.h"
 
 #ifndef DENIZENDEF

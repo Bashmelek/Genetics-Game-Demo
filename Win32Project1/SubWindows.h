@@ -15,6 +15,7 @@
 #define WINDOWLENGTH 1400
 #define WINDOWHEIGHT 1000
 #define SIDEBARWIDTH 280
+#define TOPBARHEIGHT 40
 #define DETAILSECTIONHEIGHT 290
 #define DETAILTABSSECTIONHEIGHT 35
 
@@ -22,6 +23,9 @@
 #define BUTTON_EXITGAME 101
 #define BUTTON_NEXTTURN 102
 #define BUTTON_MESSAGETAB 103
+//104 is idm_about
+//105 is idm_exit
+#define BUTTON_ALLELESTAB 106
 
 
 
@@ -128,7 +132,7 @@ protected:
 
 
 
-class GameMessagesWindow : public SubWindow<GameMessagesWindow>
+class GameInfoWindow : public SubWindow<GameInfoWindow>
 {
 public:
 	PCWSTR  ClassName() const;
@@ -186,7 +190,7 @@ public:
 		////uMsg != 32 && uMsg != 512 && uMsg != 132 && uMsg != 522
 		default:
 			LRESULT res = CallWindowProc(
-				GameMessagesWindow::OriginalScrollbarProc,
+				GameInfoWindow::OriginalScrollbarProc,
 				hwnd, uMsg, wParam, lParam
 			);
 			HDC otherDC = GetDC(hwnd);
@@ -221,6 +225,7 @@ public:
 
 protected:
 	HWND messagesButtonWindow;
+	HWND allelesButtonWindow;
 };
 
 

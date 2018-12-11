@@ -24,6 +24,7 @@ LRESULT GameInfoTabsWindow::HandleMessage(UINT message, WPARAM wParam, LPARAM lP
 		switch (wmId)
 		{
 		case BUTTON_MESSAGETAB:
+		case BUTTON_ALLELESTAB:
 			SendMessage( GetParent((*this).Window()), WM_COMMAND, wParam, NULL);
 			break;
 		default:
@@ -57,13 +58,19 @@ void GameInfoTabsWindow::InitInternals()
 		WS_VISIBLE | WS_CHILD,// | BS_OWNERDRAW,// | BS_NOTIFY,
 		10, 5, 80, 25,
 		(*this).Window(), (HMENU)BUTTON_MESSAGETAB, NULL, NULL);
+
+	allelesButtonWindow = CreateWindowEx(NULL, TEXT("BUTTON"), TEXT("Alleles"),
+		WS_VISIBLE | WS_CHILD,// | BS_OWNERDRAW,// | BS_NOTIFY,
+		100, 5, 80, 25,
+		(*this).Window(), (HMENU)BUTTON_ALLELESTAB, NULL, NULL);
 }
 
 
 
-PCWSTR  GameMessagesWindow::ClassName() const { return L"Game Message Window Class"; }
 
-WNDPROC GameMessagesWindow::OriginalScrollbarProc = 0;
+PCWSTR  GameInfoWindow::ClassName() const { return L"Game Message Window Class"; }
+
+WNDPROC GameInfoWindow::OriginalScrollbarProc = 0;
 //LRESULT CALLBACK CustomScrollbarProc(HWND hWnd, UINT msg,
 //	WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass,
 //	DWORD_PTR dwRefData)
@@ -84,7 +91,7 @@ WNDPROC GameMessagesWindow::OriginalScrollbarProc = 0;
 //}
 
 
-LRESULT GameMessagesWindow::HandleMessage(UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT GameInfoWindow::HandleMessage(UINT message, WPARAM wParam, LPARAM lParam)
 {
 	int wmId, wmEvent;
 	PAINTSTRUCT ps;

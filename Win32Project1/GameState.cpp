@@ -12,6 +12,7 @@ void GameState::StartNewGame(HWND hwnd)
 {
 	_gameMode = ENTERINGGAME;
 	srand(time(NULL));
+	selectedPerson = NULL;
 	//float i = cos(1.0);
 	/*if(bio != NULL)
 	{ 
@@ -31,6 +32,7 @@ void GameState::StartNewGame(HWND hwnd)
 	GenerateFirstPeopleDemo();
 	////player1(std::make_unique<DivinePlayer>());
 	player1 = std::make_unique<DivinePlayer>();
+	WorldMap::TheWorld().Initialize(DEFAULTWORLDWIDTH, DEFAULTWORLDHEIGHT);
 	_gameMode = INGAME;
 
 	turnNumber = 0;
@@ -227,7 +229,7 @@ void GameState::DenizenSelectMate(Denizen * seeker)
 		}
 		else if(currentPartner != NULL)
 		{
-			if ((*currentPartner).currentRelationship == courting && (*currentPartner).currentRelationshipAge >= 6 && (rand() % 5) == 0)
+			if ((*currentPartner).currentRelationship == courting && (*currentPartner).currentRelationshipAge >= 6 && (rand() % 4) == 0)
 			{
 				requestResponse proposalResponse = (*(*currentPartner).person).HearRequest(marriage, (*currentPartner).ownerNode);
 				if (proposalResponse == yes)
@@ -242,7 +244,7 @@ void GameState::DenizenSelectMate(Denizen * seeker)
 					gameMessages.push_back(relationshipStartMessage);
 				}
 			}
-			else if ((*currentPartner).currentRelationship == married && (rand() % 4) == 0)
+			else if ((*currentPartner).currentRelationship == married && (rand() % 3) == 0)
 			{
 				requestResponse loveResponse = (*(*currentPartner).person).HearRequest(copulate, (*currentPartner).ownerNode);
 				if (loveResponse == yes)

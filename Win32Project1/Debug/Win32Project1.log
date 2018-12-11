@@ -1,8 +1,2 @@
-﻿  GameViewState.cpp
-c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\gameviewstate.cpp(208): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\gameviewstate.cpp(214): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\gameviewstate.cpp(225): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-  GameWindow.cpp
-  Win32Project1.cpp
-  Generating Code...
+﻿  WorldMap.cpp
   Win32Project1.vcxproj -> C:\Users\gfray\Documents\Visual Studio 2017\Projects\WinPractice\Debug\Win32Project1.exe

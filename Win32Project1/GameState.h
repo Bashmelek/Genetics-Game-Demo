@@ -17,11 +17,14 @@ class GameState
 		std::list<std::unique_ptr<Denizen>> theLiving;
 		std::list<std::unique_ptr<Denizen>> theDead;
 		std::unique_ptr<DivinePlayer> player1;
+		////std::unique_ptr<WorldMap> theWorld;
 		void StartNewGame(HWND hwnd);
 		GAMEMODE GetGameMode();
 		void NextTurn();
 		std::list<std::wstring> gameMessages;
 		int turnNumber;
+
+		Denizen* selectedPerson;
 
 		////std::unique_ptr<Biology> bio;
 		//void InitIntroScreen(HWND hwnd);
