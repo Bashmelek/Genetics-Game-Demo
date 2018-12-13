@@ -133,7 +133,7 @@ void GameViewState::HandleButtonInput(int buttonID)
 		(*_gameInfoTabsWindow).InitInternals();
 
 		currentGameInfoTab = 0;
-		////IsOnAutoTime = true;///////////-----------------------------normally shall be FALSE!!!!!!!!!!FAAAALLLSSSEEE!!!
+		IsOnAutoTime = true;///////////-----------------------------normally shall be FALSE!!!!!!!!!!FAAAALLLSSSEEE!!!
 		autoTimeProgress = 0;
 
 		break;

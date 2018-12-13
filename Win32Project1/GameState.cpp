@@ -29,10 +29,11 @@ void GameState::StartNewGame(HWND hwnd)
 		BirthDenizen(&(*newPerson));
 		theLiving.push_back(std::move(newPerson));
 	}*/
+
+	WorldMap::TheWorld().Initialize(DEFAULTWORLDWIDTH, DEFAULTWORLDHEIGHT);
 	GenerateFirstPeopleDemo();
 	////player1(std::make_unique<DivinePlayer>());
 	player1 = std::make_unique<DivinePlayer>();
-	WorldMap::TheWorld().Initialize(DEFAULTWORLDWIDTH, DEFAULTWORLDHEIGHT);
 	_gameMode = INGAME;
 
 	turnNumber = 0;
@@ -133,6 +134,10 @@ void GameState::ProcessDenizenActivity()
 		{
 			std::wstring deathMessage = (*(*i)).shortName;
 			deathMessage.append(L" passed away.");
+			if (WorldMap::TheWorld().worldCells[(*(*i)).worldX][(*(*i)).worldY].Occupant == &(*(*i)))
+			{
+				WorldMap::TheWorld().worldCells[(*(*i)).worldX][(*(*i)).worldY].Occupant = NULL;
+			}
 			theDead.push_back(std::move(*i));
 			theLiving.erase(i++);
 			//theDead.
@@ -296,7 +301,7 @@ void GameState::GenerateFirstPeopleDemo()
 			momgenes.push_back(&(*(*Biology::bio()).genepool[6]));
 			momgenes.push_back(&(*(*Biology::bio()).genepool[0]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[1]));
-			dadgenes.push_back(&(*(*Biology::bio()).genepool[6]));
+			dadgenes.push_back(&(*(*Biology::bio()).genepool[7]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[8]));
 			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(male, L"Bobbo", 240, momgenes, dadgenes, &theLiving, 0, 0);
 			BirthDenizen(&(*newPerson));
@@ -306,7 +311,7 @@ void GameState::GenerateFirstPeopleDemo()
 		case 1:
 		{
 			momgenes.push_back(&(*(*Biology::bio()).genepool[2]));
-			momgenes.push_back(&(*(*Biology::bio()).genepool[6]));
+			momgenes.push_back(&(*(*Biology::bio()).genepool[7]));
 			momgenes.push_back(&(*(*Biology::bio()).genepool[0]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[2]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[6]));
@@ -322,7 +327,7 @@ void GameState::GenerateFirstPeopleDemo()
 			momgenes.push_back(&(*(*Biology::bio()).genepool[6]));
 			momgenes.push_back(&(*(*Biology::bio()).genepool[0]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[5]));
-			dadgenes.push_back(&(*(*Biology::bio()).genepool[6]));
+			dadgenes.push_back(&(*(*Biology::bio()).genepool[7]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[8]));
 			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(male, L"Thomas", 300, momgenes, dadgenes, &theLiving, 0, 5);
 			BirthDenizen(&(*newPerson));
@@ -335,7 +340,7 @@ void GameState::GenerateFirstPeopleDemo()
 			momgenes.push_back(&(*(*Biology::bio()).genepool[6]));
 			momgenes.push_back(&(*(*Biology::bio()).genepool[0]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[2]));
-			dadgenes.push_back(&(*(*Biology::bio()).genepool[6]));
+			dadgenes.push_back(&(*(*Biology::bio()).genepool[7]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[0]));
 			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(female, L"Hannah", 220, momgenes, dadgenes, &theLiving, 5, 5);
 			BirthDenizen(&(*newPerson));
@@ -348,7 +353,7 @@ void GameState::GenerateFirstPeopleDemo()
 			momgenes.push_back(&(*(*Biology::bio()).genepool[6]));
 			momgenes.push_back(&(*(*Biology::bio()).genepool[0]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[3]));
-			dadgenes.push_back(&(*(*Biology::bio()).genepool[6]));
+			dadgenes.push_back(&(*(*Biology::bio()).genepool[7]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[8]));
 			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(male, L"Erick", 400, momgenes, dadgenes, &theLiving, 2, 8);
 			BirthDenizen(&(*newPerson));
@@ -371,10 +376,10 @@ void GameState::GenerateFirstPeopleDemo()
 		case 6:
 		{
 			momgenes.push_back(&(*(*Biology::bio()).genepool[4]));
-			momgenes.push_back(&(*(*Biology::bio()).genepool[6]));
+			momgenes.push_back(&(*(*Biology::bio()).genepool[7]));
 			momgenes.push_back(&(*(*Biology::bio()).genepool[0]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[2]));
-			dadgenes.push_back(&(*(*Biology::bio()).genepool[6]));
+			dadgenes.push_back(&(*(*Biology::bio()).genepool[7]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[8]));
 			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(male, L"Mortimer", 640, momgenes, dadgenes, &theLiving, 3, 6);
 			BirthDenizen(&(*newPerson));
@@ -384,7 +389,7 @@ void GameState::GenerateFirstPeopleDemo()
 		case 7:
 		{
 			momgenes.push_back(&(*(*Biology::bio()).genepool[2]));
-			momgenes.push_back(&(*(*Biology::bio()).genepool[6]));
+			momgenes.push_back(&(*(*Biology::bio()).genepool[7]));
 			momgenes.push_back(&(*(*Biology::bio()).genepool[0]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[2]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[6]));

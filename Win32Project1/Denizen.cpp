@@ -147,8 +147,9 @@ Denizen::Denizen(genderEnum gender, std::wstring shortName, int ageMonths, std::
 	}
 	
 	(*this).isBorn = true;
-	(*this).worldX = worldX;
-	(*this).worldY = worldY;
+	(*this).worldX = 0;
+	(*this).worldY = 0;
+	this->SetWorldPositionToClosestPoint(worldX, worldY);
 	(*this).shortName = shortName;
 	(*this).gender = gender;
 	(*this).ageMonths = ageMonths;
@@ -171,6 +172,8 @@ Denizen::Denizen(Denizen* parent1, Denizen* parent2)
 
 	(*this).isBorn = false;
 	(*this).monthsGestating = 0;
+	(*this).worldX = 0;
+	(*this).worldY = 0;
 
 	if ((*parent1).gender == female)
 	{
@@ -421,8 +424,7 @@ std::wstring Denizen::BeBorn(std::list<std::unique_ptr<Denizen>>* currentLiving)
 		courtshipStyle = chaser;
 	}
 
-	worldX = (*(*mother).person).worldX;
-	worldY = (*(*mother).person).worldY + 1;
+	this->SetWorldPositionToClosestPoint((*(*mother).person).worldX, (*(*mother).person).worldY);
 
 	isBorn = true;
 	std::wstring birthMessage = shortName;

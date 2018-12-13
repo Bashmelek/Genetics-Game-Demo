@@ -21,6 +21,9 @@ public:
 	int worldY;
 	int currentFrame;
 	int totalFrames;
+
+	void SetWorldPositionDirect(int x, int y);
+	void SetWorldPositionToClosestPoint(int x, int y);
 };
 
 
