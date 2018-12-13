@@ -52,18 +52,18 @@ WorldCell* WorldMap::FindNearestOpenCell(int x, int y)
 
 	while (freeCell == NULL)
 	{
-		if (currentX < 0 || currentX >(*this).worldWidth)
+		if (currentX < 0 || currentX >= (*this).worldWidth)
 		{
-			if (x - currentDistance < 0 && x + currentDistance > (*this).worldWidth
-					&& y - currentDistance < 0 && y + currentDistance > (*this).worldWidth)
+			if (x - currentDistance < 0 && x + currentDistance >= (*this).worldWidth
+					&& y - currentDistance < 0 && y + currentDistance >= (*this).worldHeight)
 			{
 				return NULL;
 			}
 		}
-		else if(currentY < 0 || currentY >(*this).worldHeight)
+		else if(currentY < 0 || currentY >= (*this).worldHeight)
 		{
-			if (x - currentDistance < 0 && x + currentDistance > (*this).worldWidth
-					&& y - currentDistance < 0 && y + currentDistance > (*this).worldWidth)
+			if (x - currentDistance < 0 && x + currentDistance >= (*this).worldWidth
+					&& y - currentDistance < 0 && y + currentDistance >= (*this).worldHeight)
 			{
 				return NULL;
 			}

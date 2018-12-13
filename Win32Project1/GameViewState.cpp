@@ -413,7 +413,10 @@ void GameViewState::AnimateWorldFrame()
 	std::list<std::unique_ptr<Denizen>>::iterator i;
 	for (i = (*_gameState).theLiving.begin(); i != (*_gameState).theLiving.end(); i++)
 	{
-		DrawObject( &(*(*i)) );
+		if ((*i)->isBorn)
+		{
+			DrawObject(&(*(*i)));
+		}
 	}
 }
 

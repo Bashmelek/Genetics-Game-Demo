@@ -234,7 +234,7 @@ void GameState::DenizenSelectMate(Denizen * seeker)
 		}
 		else if(currentPartner != NULL)
 		{
-			if ((*currentPartner).currentRelationship == courting && (*currentPartner).currentRelationshipAge >= 6 && (rand() % 4) == 0)
+			if ((*currentPartner).currentRelationship == courting && (*currentPartner).currentRelationshipAge >= 6 && (rand() % 3) == 0)
 			{
 				requestResponse proposalResponse = (*(*currentPartner).person).HearRequest(marriage, (*currentPartner).ownerNode);
 				if (proposalResponse == yes)
@@ -249,7 +249,7 @@ void GameState::DenizenSelectMate(Denizen * seeker)
 					gameMessages.push_back(relationshipStartMessage);
 				}
 			}
-			else if ((*currentPartner).currentRelationship == married && (rand() % 3) == 0)
+			else if ((*currentPartner).currentRelationship == married && (rand() % 2) == 0)
 			{
 				requestResponse loveResponse = (*(*currentPartner).person).HearRequest(copulate, (*currentPartner).ownerNode);
 				if (loveResponse == yes)
@@ -381,7 +381,7 @@ void GameState::GenerateFirstPeopleDemo()
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[2]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[7]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[8]));
-			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(male, L"Mortimer", 640, momgenes, dadgenes, &theLiving, 3, 6);
+			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(male, L"Mortimer", 540, momgenes, dadgenes, &theLiving, 3, 6);
 			BirthDenizen(&(*newPerson));
 			theLiving.push_back(std::move(newPerson));
 			break;
@@ -420,7 +420,7 @@ void GameState::GenerateFirstPeopleDemo()
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[5]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[7]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[0]));
-			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(female, L"Barbara", 280, momgenes, dadgenes, &theLiving, 4, 10);
+			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(female, L"Barbara", 270, momgenes, dadgenes, &theLiving, 4, 10);
 			BirthDenizen(&(*newPerson));
 			theLiving.push_back(std::move(newPerson));
 			break;

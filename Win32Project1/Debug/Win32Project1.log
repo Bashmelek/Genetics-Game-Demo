@@ -1,3 +1,16 @@
-﻿  GameState.cpp
+﻿  Denizen.cpp
+c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\denizen.cpp(268): warning C4018: '<=': signed/unsigned mismatch
+c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\denizen.cpp(373): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  GameObject.cpp
+  GameState.cpp
 c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\gamestate.cpp(14): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  GameViewState.cpp
+c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\gameviewstate.cpp(233): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\gameviewstate.cpp(239): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\gameviewstate.cpp(250): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+  GameWindow.cpp
+  SocialSphere.cpp
+  Win32Project1.cpp
+  WorldMap.cpp
+  Generating Code...
   Win32Project1.vcxproj -> C:\Users\gfray\Documents\Visual Studio 2017\Projects\WinPractice\Debug\Win32Project1.exe

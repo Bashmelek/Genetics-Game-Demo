@@ -352,13 +352,13 @@ bool Denizen::TryHaveChildren(Denizen& partner)
 	}
 
 
-	if (ageMonths / 12 < 49 && ageMonths / 12 > 14 && 
-		partner.ageMonths / 12 < 49 && partner.ageMonths / 12 > 14 &&
-		(rand() % 3) == 0)
+	if (ageMonths / 12 < 49 && ageMonths / 12 > 11 && 
+		partner.ageMonths / 12 < 49 && partner.ageMonths / 12 > 11 &&
+		(rand() % 2) == 0)
 	{
 		return true;
 	}
-	return false;;
+	return false;
 }
 
 bool Denizen::TryNaturalDeath()
@@ -462,7 +462,7 @@ int Denizen::EvaluateAsMate(SocialNode* mate)
 	else if ((*mate).currentRelationship == married)
 	{
 		score += 6;
-		if ((*mate).currentRelationshipAge > 18)
+		if ((*mate).currentRelationshipAge > 72)
 		{
 			score -= 2;
 		}
