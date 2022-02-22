@@ -3,20 +3,44 @@
 #include <list>
 #include "Genome.h"
 #include "GameObject.h"
+#include "Strategy.h"
+#include "Inventory.h"
 /////#include "SocialSphere.h"
 
 #ifndef DENIZENDEF
 #define DENIZENDEF
 
-enum genderEnum{ female = 0, male = 1 };
-enum RelationshipStatus { none, courting, beingCourted, ex, married, mother, father, child };
-enum CourtshipStyle { chaser, beingChased };
+namespace genderEnum
+{
+	enum genderEnum { female = 0, male = 1 };
+}
+namespace RelationshipStatus
+{
+	enum RelationshipStatus { none, courting, beingCourted, ex, married, mother, father, child };
+}
+namespace CourtshipStyle
+{
+	enum CourtshipStyle { chaser, beingChased };
+}
 
-enum request { court, marriage, copulate };
-enum requestResponse { no, yes };
-enum responseReaction { accept, reject };
+namespace request
+{
+	enum request { court, marriage, copulate };
+}
+namespace requestResponse
+{
+	enum requestResponse { no, yes };
+}
 
-enum geneWinType { noneWin, fatherWin, motherWin, mixWin, bothWin };
+namespace responseReaction
+{
+	enum responseReaction { accept, reject };
+}
+
+namespace geneWinType
+{
+	enum geneWinType { noneWin, fatherWin, motherWin, mixWin, bothWin };
+}
 
 class Denizen;
 
@@ -25,7 +49,7 @@ class SocialNode
 {
 public:
 	SocialNode();
-	SocialNode(Denizen* person, RelationshipStatus relationship);// , Denizen* owner, bool ownerIsNewPerson);
+	SocialNode(Denizen* person, RelationshipStatus::RelationshipStatus relationship);// , Denizen* owner, bool ownerIsNewPerson);
 	SocialNode* ownerNode;
 	Denizen * person;
 	int currentRelationship;
@@ -50,22 +74,23 @@ public:
 	Denizen(bool isDummy);
 	Denizen(bool isDummy, int num, std::list<std::unique_ptr<Denizen>>* currentLiving);
 
-	Denizen(genderEnum gender, std::wstring shortName, int ageMonths, std::list<Gene*> momgenes, std::list<Gene*> dadgenes, std::list<std::unique_ptr<Denizen>>* currentLiving, int worldX, int worldY);
+	Denizen(genderEnum::genderEnum gender, std::wstring shortName, int ageMonths, std::list<Gene*> momgenes, std::list<Gene*> dadgenes, std::list<std::unique_ptr<Denizen>>* currentLiving, int worldX, int worldY);
 	Denizen(Denizen* parent1, Denizen* parent2);
 
 	int age;
 	int ageMonths;
-	genderEnum gender;
+	genderEnum::genderEnum gender;
 	SocialNode* father;
 	SocialNode* mother;
 	std::wstring shortName;
 	SocialNode* currentPartner;
 	SocialNode* potentialPartnerInMind;
-	CourtshipStyle courtshipStyle;
-	RelationshipStatus partnerRelationshipStatus;
+	CourtshipStyle::CourtshipStyle courtshipStyle;
+	RelationshipStatus::RelationshipStatus partnerRelationshipStatus;
 	int totalPartnerRelationshipDuration;
 	int currentPartnerRelationshipDuration;
 	SocialSphere socialSphere;
+	Inventory inventory;
 
 	Genome genome;
 
@@ -93,20 +118,26 @@ public:
 	bool TryHaveChildren(Denizen&  partner);
 	bool TryNaturalDeath();
 
-	requestResponse HearRequest(request req, SocialNode * source);
+	requestResponse::requestResponse HearRequest(request::request req, SocialNode * source);
 	int EvaluateAsMate(SocialNode* mate);
-	void ChangeRelationshipWithOther(RelationshipStatus newRelationship, SocialNode * other);
+	void ChangeRelationshipWithOther(RelationshipStatus::RelationshipStatus newRelationship, SocialNode * other);
 	int TryToBeBorn();
 	void InitializeRelationships(std::list<std::unique_ptr<Denizen>>* currentLiving);
 	std::wstring BeBorn(std::list<std::unique_ptr<Denizen>>* currentLiving);
 
+	Strategy strategy;
+	void CreateStrategyForMonth();
+	void Act(int dayTimeSlot);
+
 protected:
 	void BaseInit();
 	void InitializeRelationships(std::list<std::unique_ptr<Denizen>>* currentLiving, Denizen* father, Denizen* mother);
-	void InitializeSingleRelationship(Denizen* otherGuy, RelationshipStatus whatThisGuyThinks, RelationshipStatus whatOtherGuyThinks);
+	void InitializeSingleRelationship(Denizen* otherGuy, RelationshipStatus::RelationshipStatus whatThisGuyThinks, RelationshipStatus::RelationshipStatus whatOtherGuyThinks);
 
 	void InitializeStarterAlleles();
-	void SetAlleleForGene(Gene* dadgene, Gene* momgene, geneWinType wintype);
+	void SetAlleleForGene(Gene* dadgene, Gene* momgene, geneWinType::geneWinType wintype);
+	
+	void GatherFood();
 };
 
 

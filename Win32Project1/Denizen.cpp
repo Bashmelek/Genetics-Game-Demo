@@ -3,14 +3,7 @@
 
 Denizen::Denizen()
 {
-	imageBase = (HBITMAP)LoadImage(
-		NULL,
-		L"Lildude.bmp",////\\GameResources
-		IMAGE_BITMAP,
-		0,
-		0,
-		LR_LOADFROMFILE
-	);
+	
 }
 
 void Denizen::BaseInit()
@@ -47,92 +40,7 @@ void Denizen::BaseInit()
 	monthsPregnant = 0;
 }
 
-
-Denizen::Denizen(bool isDummy)
-{
-	BaseInit();
-	worldX = 0;
-	worldY = 0;
-}
-
-Denizen::Denizen(bool isDummy, int num, std::list<std::unique_ptr<Denizen>>* currentLiving) : socialSphere()
-{
-	BaseInit();
-	switch (num)
-	{
-	case 0:
-		worldX = 0;
-		worldY = 0;
-		gender = male;
-		age = 20;
-		shortName = L"Bob";
-		break;
-	case 1:
-		worldX = 5;
-		worldY = 5;
-		gender = male;
-		shortName = L"Billy";
-		age = 40;
-		break;
-	case 2:
-		worldX = 10;
-		worldY = 5;
-		gender = female;
-		shortName = L"Dana";
-		age = 10;
-		break;
-	case 3:
-		worldX = 5;
-		worldY = 10;
-		gender = female;
-		age = 24;
-		shortName = L"Jane";
-		break;
-	case 4:
-		worldX = 0;
-		worldY = 5;
-		gender = female;
-		shortName = L"Leia";
-		age = 60;
-		break;
-	case 5:
-		worldX = 5;
-		worldY = 0;
-		gender = male;
-		shortName = L"Zeno";
-		age = 19;
-		break;
-	case 6:
-		worldX = 7;
-		worldY = 2;
-		gender = female;
-		shortName = L"Adelaide";
-		age = 38;
-		break;
-	case 7:
-		worldX = 2;
-		worldY = 7;
-		gender = male;
-		age = 27;
-		shortName = L"Maron";
-		break;
-	default:
-		break;
-	}
-
-	ageMonths = age * 12;
-	if (gender == female)
-	{
-		courtshipStyle = beingChased;
-	}
-	else
-	{
-		courtshipStyle = chaser;
-	}
-	InitializeRelationships(currentLiving, 0, 0);
-}
-
-Denizen::Denizen(genderEnum gender, std::wstring shortName, int ageMonths, std::list<Gene*> momgenes, std::list<Gene*> dadgenes, std::list<std::unique_ptr<Denizen>>* currentLiving, int worldX, int worldY)
+Denizen::Denizen(genderEnum::genderEnum gender, std::wstring shortName, int ageMonths, std::list<Gene*> momgenes, std::list<Gene*> dadgenes, std::list<std::unique_ptr<Denizen>>* currentLiving, int worldX, int worldY)
 {
 	BaseInit();
 	std::list<Gene*>::iterator i;
@@ -154,13 +62,13 @@ Denizen::Denizen(genderEnum gender, std::wstring shortName, int ageMonths, std::
 	(*this).gender = gender;
 	(*this).ageMonths = ageMonths;
 	age = ageMonths/12;
-	if (gender == female)
+	if (gender == genderEnum::female)
 	{
-		courtshipStyle = beingChased;
+		courtshipStyle = CourtshipStyle::beingChased;
 	}
 	else
 	{
-		courtshipStyle = chaser;
+		courtshipStyle = CourtshipStyle::chaser;
 	}
 	InitializeRelationships(currentLiving, 0, 0);
 	InitializeStarterAlleles();
@@ -175,7 +83,7 @@ Denizen::Denizen(Denizen* parent1, Denizen* parent2)
 	(*this).worldX = 0;
 	(*this).worldY = 0;
 
-	if ((*parent1).gender == female)
+	if ((*parent1).gender == genderEnum::female)
 	{
 		(*this).genome.InitializeGenome(&(*parent2).genome, &(*parent1).genome);
 		InitializeSingleRelationship(parent1, RelationshipStatus::mother, RelationshipStatus::child);
@@ -183,14 +91,6 @@ Denizen::Denizen(Denizen* parent1, Denizen* parent2)
 		(*parent1).isPregnant = true;
 		(*parent1).monthsPregnant = 0;
 		(*parent1).kidsPregnantWith.push_back(this);
-		//socialSphere.relationships.push_back(SocialNode(parent1, RelationshipStatus::mother));// , this, true));
-		//SocialNode* newGuysNodeForExistingPerson = &(socialSphere.relationships.back());
-		//(*parent1).socialSphere.relationships.push_back(SocialNode(this, RelationshipStatus::child));//, &(*(*i)), false));
-		//SocialNode* existingGuysNodeForNewPerson = &((*parent1).socialSphere.relationships.back());
-		//(*newGuysNodeForExistingPerson).ownerNode = existingGuysNodeForNewPerson;
-		//(*existingGuysNodeForNewPerson).ownerNode = newGuysNodeForExistingPerson;
-		//(*parent1).socialSphere.relationshipTypes[0].push_back(existingGuysNodeForNewPerson);
-		//socialSphere.relationshipTypes[0].push_back(newGuysNodeForExistingPerson);
 	}
 	else
 	{
@@ -205,13 +105,13 @@ Denizen::Denizen(Denizen* parent1, Denizen* parent2)
 	(*this).father = socialSphere.relationshipTypes[RelationshipStatus::father].front();
 	InitializeStarterAlleles();
 
-	if (alleles[maleness] == 1)
+	if (alleles[GeneSection::maleness] == 1)
 	{
-		gender = male;
+		gender = genderEnum::male;
 	}
 	else
 	{
-		gender = female;
+		gender = genderEnum::female;
 	}
 }
 
@@ -230,19 +130,11 @@ void Denizen::InitializeRelationships(std::list<std::unique_ptr<Denizen>>* curre
 		{
 			InitializeSingleRelationship(&(*(*i)), RelationshipStatus::none, RelationshipStatus::none);
 		}
-		//socialSphere.relationships.push_back(SocialNode(&(*(*i)), none));// , this, true));
-		//SocialNode* newGuysNodeForExistingPerson = &(socialSphere.relationships.back());
-		//(*(*i)).socialSphere.relationships.push_back(SocialNode(this, none));//, &(*(*i)), false));
-		//SocialNode* existingGuysNodeForNewPerson = &((*(*i)).socialSphere.relationships.back());
-		//(*newGuysNodeForExistingPerson).ownerNode = existingGuysNodeForNewPerson;
-		//(*existingGuysNodeForNewPerson).ownerNode = newGuysNodeForExistingPerson;
-		//(*(*i)).socialSphere.relationshipTypes[none].push_back(existingGuysNodeForNewPerson);
-		//socialSphere.relationshipTypes[none].push_back(newGuysNodeForExistingPerson);
 	}
 }
 
 
-void Denizen::InitializeSingleRelationship(Denizen* otherGuy, RelationshipStatus whatThisGuyThinks, RelationshipStatus whatOtherGuyThinks)
+void Denizen::InitializeSingleRelationship(Denizen* otherGuy, RelationshipStatus::RelationshipStatus whatThisGuyThinks, RelationshipStatus::RelationshipStatus whatOtherGuyThinks)
 {
 	(*this).socialSphere.relationships.push_back(SocialNode(otherGuy, whatThisGuyThinks));// , this, true));
 	SocialNode* newGuysNodeForExistingPerson = &(socialSphere.relationships.back());
@@ -264,7 +156,7 @@ void Denizen::InitializeStarterAlleles()
 
 	for (int i = 0; i < maxGenesection; i++)
 	{
-		geneWinType winType;
+		geneWinType::geneWinType winType;
 		if (genome.maternalGenes.size() <= i)
 		{
 			i = maxGenesection;
@@ -320,7 +212,7 @@ void Denizen::InitializeStarterAlleles()
 
 }
 
-void Denizen::SetAlleleForGene(Gene* dadgene, Gene* momgene, geneWinType wintype)
+void Denizen::SetAlleleForGene(Gene* dadgene, Gene* momgene, geneWinType::geneWinType wintype)
 {
 	if (wintype == geneWinType::motherWin)
 	{
@@ -339,7 +231,7 @@ void Denizen::SetAlleleForGene(Gene* dadgene, Gene* momgene, geneWinType wintype
 
 bool Denizen::TryHaveChildren(Denizen& partner)
 {
-	if (gender == female)
+	if (gender == genderEnum::female)
 	{
 		if (isPregnant)
 		{
@@ -407,7 +299,7 @@ std::wstring Denizen::BeBorn(std::list<std::unique_ptr<Denizen>>* currentLiving)
 	//must add bit to give birth to all kids being carried
 	(*(*mother).person).kidsPregnantWith.remove(this);
 	InitializeRelationships(currentLiving);
-	if (gender == male)
+	if (gender == genderEnum::male)
 	{
 		shortName = L"Sam";//get name
 	}
@@ -415,13 +307,13 @@ std::wstring Denizen::BeBorn(std::list<std::unique_ptr<Denizen>>* currentLiving)
 	{
 		shortName = L"Sally";
 	}
-	if (gender == female)
+	if (gender == genderEnum::female)
 	{
-		courtshipStyle = beingChased;
+		courtshipStyle = CourtshipStyle::beingChased;
 	}
 	else
 	{
-		courtshipStyle = chaser;
+		courtshipStyle = CourtshipStyle::chaser;
 	}
 
 	this->SetWorldPositionToClosestPoint((*(*mother).person).worldX, (*(*mother).person).worldY);
@@ -433,9 +325,9 @@ std::wstring Denizen::BeBorn(std::list<std::unique_ptr<Denizen>>* currentLiving)
 	return birthMessage;
 }
 
-requestResponse Denizen::HearRequest(request req, SocialNode * source)
+requestResponse::requestResponse Denizen::HearRequest(request::request req, SocialNode * source)
 {
-	return yes;
+	return requestResponse::yes;
 }
 
 int Denizen::EvaluateAsMate(SocialNode* mate)
@@ -446,12 +338,12 @@ int Denizen::EvaluateAsMate(SocialNode* mate)
 	}
 	int score = 0;
 	Denizen* potentialMate = (*mate).person;
-	genderEnum oppositeGender = gender == male ? female : male;
+	genderEnum::genderEnum oppositeGender = gender == genderEnum::male ? genderEnum::female : genderEnum::male;
 	if ((*potentialMate).gender != oppositeGender)
 	{
 		return 0;
 	}
-	if ((*mate).currentRelationship == courting)
+	if ((*mate).currentRelationship == RelationshipStatus::courting)
 	{
 		score += 2;
 		if ((*mate).currentRelationshipAge > 3)
@@ -459,7 +351,7 @@ int Denizen::EvaluateAsMate(SocialNode* mate)
 			score += 2;
 		}
 	}
-	else if ((*mate).currentRelationship == married)
+	else if ((*mate).currentRelationship == RelationshipStatus::married)
 	{
 		score += 6;
 		if ((*mate).currentRelationshipAge > 72)
@@ -467,7 +359,7 @@ int Denizen::EvaluateAsMate(SocialNode* mate)
 			score -= 2;
 		}
 	}
-	else if ((*mate).currentRelationship == ex)
+	else if ((*mate).currentRelationship == RelationshipStatus::ex)
 	{
 		return score -= 2;
 	}
@@ -478,18 +370,11 @@ int Denizen::EvaluateAsMate(SocialNode* mate)
 	return ((*potentialMate).ageMonths / 12) > 15 && ((*potentialMate).ageMonths/12) < (ageMonths / 12) ? score + (rand() % 10) : 0;
 }
 
-void Denizen::ChangeRelationshipWithOther(RelationshipStatus newRelationship, SocialNode * other)
+void Denizen::ChangeRelationshipWithOther(RelationshipStatus::RelationshipStatus newRelationship, SocialNode * other)
 {
 	int oldRelationship = (*other).currentRelationship;
 	std::list<SocialNode*>::iterator i;
-	/*for (i = socialSphere.relationshipTypes[oldRelationship].begin(); i < socialSphere.relationshipTypes[oldRelationship].end();
-		i != socialSphere.relationshipTypes[oldRelationship].end() ? i++ : i = i)
-	{
-		if( (*i) == other )
-		{
-			socialSphere.relationshipTypes[oldRelationship].remove(other);
-		}
-	}*/
+
 	//beware the linearity of remove!
 	socialSphere.relationshipTypes[oldRelationship].remove(other);
 	socialSphere.relationshipTypes[newRelationship].push_back(other);
@@ -498,26 +383,53 @@ void Denizen::ChangeRelationshipWithOther(RelationshipStatus newRelationship, So
 }
 
 
-//void Denizen::DrawObject()
-//{
-//	HDC hdc = (*GameViewState::TheGameView()).deviceContext;
-//	//HDC memdc = CreateCompatibleDC(hdc);
-//	HDC memdc = (*GameViewState::TheGameView()).memoryDC;
-//
-//	HDC tempDC = CreateCompatibleDC(memdc);// (hdc);
-//	////HDC tempDC2 = CreateCompatibleDC(memdc);
-//	//HBITMAP saveOldBitmap = (HBITMAP)SelectObject(memdc, denizenImageBase);
-//	HBITMAP saveOldTempBmp = (HBITMAP)SelectObject(tempDC, imageMask);
-//	BitBlt(memdc, 50, 50, 50, 50, tempDC, (currentFrame * 50), 0, SRCPAINT);// SRCAND);
-//	SelectObject(tempDC, imageBase);
-//	BitBlt(memdc, 50, 50, 50, 50, tempDC, (currentFrame * 50), 0, SRCAND);
-//
-//	currentFrame++;
-//	currentFrame = currentFrame % totalFrames;
-//	//////DeleteObject(saveOldTempBmp);
-//	////DeleteObject(saveOldBitmap);
-//	////DeleteDC(tempDC2);
-//	SelectObject(tempDC, saveOldTempBmp);
-//	DeleteDC(tempDC);
-//}
+
+void Denizen::CreateStrategyForMonth()
+{
+	for (int i = 0; i < ACTIONPOINTS; i++)
+	{
+		if (i > 3 && i < 15)
+		{
+			strategy.plannedActions[i].ResetWithType(ActivityType::gatherFood);
+		}
+		else if (i >= 16 && i < 18)
+		{
+			strategy.plannedActions[i].ResetWithType(ActivityType::eat);
+		}
+		else if (i >= 19 && i < 31)
+		{
+			strategy.plannedActions[i].ResetWithType(ActivityType::gatherFood);
+		}
+		else if (i >= 72)
+		{
+			strategy.plannedActions[i].ResetWithType(ActivityType::sleep);
+		}
+	}
+}
+
+void Denizen::Act(int dayTimeSlot)
+{
+
+	ActivityType::ActivityType chosenActivity = strategy.plannedActions[dayTimeSlot].action;
+	switch (chosenActivity)
+	{
+		case ActivityType::sleep:
+			break;
+
+		case ActivityType::gatherFood:
+			GatherFood();
+			break;
+
+		case ActivityType::eat:
+			break;
+
+		default:
+			break;
+	}
+}
+
+void Denizen::GatherFood()
+{
+
+}
 

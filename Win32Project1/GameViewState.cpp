@@ -161,6 +161,11 @@ void GameViewState::HandleButtonInput(int buttonID)
 	}
 }
 
+void GameViewState::DoNextStep()
+{
+	_gameState->ProcessStep();
+}
+
 
 //typically only called by the timer
 void GameViewState::DrawNextFrame(HWND hwnd)
@@ -374,7 +379,7 @@ void GameViewState::DrawAllelesInfoGameInfoWindow(HDC uiMemoryDC)
 		DrawText(uiMemoryDC, (*(*_gameState).selectedPerson).shortName.c_str(), -1, &messageRect, NULL);
 		messageRect.top += 20;
 		messageRect.bottom += 20;
-		if ((*(*_gameState).selectedPerson).alleles[eyecolor] == 1)
+		if ((*(*_gameState).selectedPerson).alleles[GeneSection::eyecolor] == 1)
 		{
 			DrawText(uiMemoryDC, L"blue eyes", -1, &messageRect, NULL);
 		}
@@ -498,7 +503,7 @@ void GameViewState::DrawObject(Denizen* gameObject)
 	BitBlt(memdc, screenLocX, screenLocY, 50, 50, tempDC, ((*gameObject).currentFrame * 50), 0, SRCPAINT);// SRCAND);
 
 	
-	if ((*gameObject).gender == male)
+	if ((*gameObject).gender == genderEnum::male)
 	{
 		SelectObject(tempDC, (*gameObject).imageBase);
 	}

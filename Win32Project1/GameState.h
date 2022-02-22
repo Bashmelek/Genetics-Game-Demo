@@ -20,9 +20,11 @@ class GameState
 		////std::unique_ptr<WorldMap> theWorld;
 		void StartNewGame(HWND hwnd);
 		GAMEMODE GetGameMode();
+		void ProcessStep();
 		void NextTurn();
 		std::list<std::wstring> gameMessages;
 		int turnNumber;
+		int dayTimeSlot;
 
 		Denizen* selectedPerson;
 
@@ -34,6 +36,7 @@ class GameState
 	private:
 		GAMEMODE _gameMode;
 		void ProcessDenizenActivity();
+		void ProcessDenizenStep(Denizen& seeker);
 		void DenizenSelectMate(Denizen * seeker);
 		void BirthDenizen(Denizen * newborn);
 

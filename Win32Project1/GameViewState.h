@@ -25,6 +25,7 @@ class GameViewState
 		void PaintScene(HWND hwnd);
 		void DrawNextFrame(HWND hwnd);
 		void HandleButtonInput(int buttonID);
+		void DoNextStep();
 
 		int mapWidth;
 		int mapHeight;

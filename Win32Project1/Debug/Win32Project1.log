@@ -1,16 +1,33 @@
-﻿  Denizen.cpp
-c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\denizen.cpp(268): warning C4018: '<=': signed/unsigned mismatch
-c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\denizen.cpp(373): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+﻿  stdafx.cpp
+  Biology.cpp
+  Denizen.cpp
+c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\denizen.cpp(160): warning C4018: '<=': signed/unsigned mismatch
+c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\denizen.cpp(265): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  DivinePlayer.cpp
   GameObject.cpp
   GameState.cpp
 c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\gamestate.cpp(14): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
   GameViewState.cpp
-c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\gameviewstate.cpp(233): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\gameviewstate.cpp(239): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\gameviewstate.cpp(250): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\gameviewstate.cpp(238): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\gameviewstate.cpp(244): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\gameviewstate.cpp(255): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
   GameWindow.cpp
+  Genome.cpp
+c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\genome.cpp(13): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\genome.cpp(68): warning C4018: '<=': signed/unsigned mismatch
+c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\genome.cpp(16): warning C4101: 'meiosisRandomizer': unreferenced local variable
+  Inventory.cpp
+  LifeAction.cpp
+  MainWindow.cpp
   SocialSphere.cpp
+  Strategy.cpp
+  SubWindows.cpp
+c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\subwindows.cpp(10): warning C4101: 'wmEvent': unreferenced local variable
+c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\subwindows.cpp(10): warning C4101: 'wmId': unreferenced local variable
+c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\subwindows.cpp(96): warning C4101: 'wmEvent': unreferenced local variable
+c:\users\gfray\documents\visual studio 2017\projects\winpractice\win32project1\subwindows.cpp(96): warning C4101: 'wmId': unreferenced local variable
   Win32Project1.cpp
+  WorldCell.cpp
   WorldMap.cpp
   Generating Code...
   Win32Project1.vcxproj -> C:\Users\gfray\Documents\Visual Studio 2017\Projects\WinPractice\Debug\Win32Project1.exe

@@ -69,10 +69,11 @@ LRESULT MainWindow::HandleMessage(UINT message, WPARAM wParam, LPARAM lParam)
 		if ((*_viewState).IsOnAutoTime)
 		{
 			(*_viewState).autoTimeProgress += 1;
-			if ((*_viewState).autoTimeProgress % 7 == 0)
+			if ((*_viewState).autoTimeProgress % 2 == 0)
 			{
 				(*_viewState).autoTimeProgress = 0;
-				(*_viewState).HandleButtonInput(BUTTON_NEXTTURN);
+				//(*_viewState).HandleButtonInput(BUTTON_NEXTTURN);
+				_viewState->DoNextStep();
 			}
 		}
 		break;

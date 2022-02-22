@@ -25,7 +25,7 @@ void Genome::InitializeGenome(Genome* dadgenome, Genome* momgenome)
 
 		for (int i = 0; i < maxGenesection; i++)
 		{
-			section = ChromosonalSpecialSection((GeneSection)i);
+			section = ChromosonalSpecialSection((GeneSection::GeneSection)i);
 			if (section != NonSpecialSection && specialSectionsContainedOriginally.find(section) == std::string::npos)
 			{
 				if ((*(*currentParentGenome).paternalGenes[i]).id != 0 || (*(*currentParentGenome).maternalGenes[i]).id != 0)
@@ -69,7 +69,7 @@ void Genome::InitializeGenome(Genome* dadgenome, Genome* momgenome)
 			{ 
 				continue; 
 			}
-			section = ChromosonalSpecialSection((GeneSection)i);
+			section = ChromosonalSpecialSection((GeneSection::GeneSection)i);
 			if (section == NonSpecialSection || specialSectionsContainedOriginally.find(section) != std::string::npos)
 			{
 				if (rand() % 2 == 0)
@@ -90,11 +90,11 @@ void Genome::InitializeGenome(Genome* dadgenome, Genome* momgenome)
 
 }
 
-char Genome::ChromosonalSpecialSection(GeneSection geneSection)
+char Genome::ChromosonalSpecialSection(GeneSection::GeneSection geneSection)
 {
 	switch (geneSection)
 	{
-	case maleness:
+	case GeneSection::maleness:
 		return 'Y';
 		break;
 	default:

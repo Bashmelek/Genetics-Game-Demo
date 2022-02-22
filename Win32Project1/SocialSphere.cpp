@@ -7,7 +7,7 @@ SocialNode::SocialNode()
 
 }
 
-SocialNode::SocialNode(Denizen* acquaintance, RelationshipStatus relationship)//, Denizen* owner, bool ownerIsNewPerson)
+SocialNode::SocialNode(Denizen* acquaintance, RelationshipStatus::RelationshipStatus relationship)//, Denizen* owner, bool ownerIsNewPerson)
 {
 	//if (ownerIsNewPerson)
 	//{

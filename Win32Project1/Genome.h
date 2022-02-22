@@ -17,7 +17,7 @@ public:
 	void InitializeGenome(Genome* dadgenome, Genome* momgenome);
 
 private:
-	char ChromosonalSpecialSection(GeneSection geneSection);
+	char ChromosonalSpecialSection(GeneSection::GeneSection geneSection);
 };
 
 

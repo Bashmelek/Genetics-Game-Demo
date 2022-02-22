@@ -13,51 +13,14 @@ void GameState::StartNewGame(HWND hwnd)
 	_gameMode = ENTERINGGAME;
 	srand(time(NULL));
 	selectedPerson = NULL;
-	//float i = cos(1.0);
-	/*if(bio != NULL)
-	{ 
-		bio.reset();
-	}
-	bio = std::make_unique<Biology>();*/
-	/*EnumChildWindows(
-		hwnd,
-		CleanWindow,
-		NULL);*/
-	/*for (int i = 0; i < 8; i++)
-	{
-		std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(true, i, &theLiving);
-		BirthDenizen(&(*newPerson));
-		theLiving.push_back(std::move(newPerson));
-	}*/
 
 	WorldMap::TheWorld().Initialize(DEFAULTWORLDWIDTH, DEFAULTWORLDHEIGHT);
 	GenerateFirstPeopleDemo();
-	////player1(std::make_unique<DivinePlayer>());
 	player1 = std::make_unique<DivinePlayer>();
 	_gameMode = INGAME;
 
 	turnNumber = 0;
-	//(*GameViewState::TheGameView()).nextTurnButtonWindow = CreateWindowEx(NULL, TEXT("button"), TEXT("Next Turn"),
-	//	WS_VISIBLE | WS_CHILD | SS_OWNERDRAW,// | WS_OVERLAPPED,
-	//	900, 5, 80, 25,
-	//	hwnd, (HMENU)BUTTON_NEXTTURN, NULL, NULL);
-	//InvalidateRect(blah, NULL, FALSE);
-	//UpdateWindow(blah);
-	/*
-	PAINTSTRUCT ps;
-	HDC hdc;
-	hdc = GetDC(hwnd);// , NULL, DCX_WINDOW);
-					  //ps.fErase = 1;
-					  //SelectObject(ps.hdc, GetStockObject(BLACK_BRUSH));
-	////ps.rcPaint = { 0, 0, 700, 400 };
-	GetClientRect(hwnd, &ps.rcPaint);
-	////FillRect(hdc, &rect, CreateSolidBrush(RGB(0, 32, 61)));// RGB(50, 200, 200)));
-	DrawGameScene(hdc, ps);
-	//Rectangle(ps.hdc, 5, 5,//rcTarget.left, rcTarget.top,
-		//700, 400);// rcTarget.right, rcTarget.bottom);
-				  //EndPaint(hwnd, &ps);
-	ReleaseDC(hwnd, hdc);*/
-	//////DrawNextFrame(hwnd);
+	dayTimeSlot = 0;
 }
 
 GAMEMODE GameState::GetGameMode()
@@ -65,6 +28,29 @@ GAMEMODE GameState::GetGameMode()
 	return _gameMode;
 }
 
+void GameState::ProcessStep()
+{
+	if (dayTimeSlot == 0)
+	{
+		std::list<std::unique_ptr<Denizen>>::iterator i;
+		for (i = theLiving.begin(); i != theLiving.end(); i++)
+		{
+			(*(*i)).CreateStrategyForMonth();
+		}
+		(*player1).AddToCurrentEnergy(5);
+		turnNumber++;
+	}
+
+	std::list<std::unique_ptr<Denizen>>::iterator c;
+	c = theLiving.begin();
+	while (c != theLiving.end())
+	{
+		ProcessDenizenStep((*(*c)));
+		c++;
+	}
+
+	dayTimeSlot = (dayTimeSlot + 1) % ACTIONPOINTS;
+}
 
 void GameState::NextTurn()
 {
@@ -87,14 +73,7 @@ void GameState::NextTurn()
 
 void GameState::BirthDenizen(Denizen * newborn)
 {
-	//initializeRelationships
-	/*std::list<std::unique_ptr<Denizen>>::iterator i;
-	for (i = theLiving.begin(); i != theLiving.end(); i != theLiving.end() ? i++ : i = i)
-	{
-		SocialNode newNode;
-		newNode.person = &(*(*i));
-		(*newborn).socialSphere.relationships.push_back(newNode);
-	}*/
+	//empty for now
 }
 
 
@@ -125,7 +104,7 @@ void GameState::ProcessDenizenActivity()
 			(*(*i)).ageMonths += 1;
 		}
 
-		if ( (*(*i)).gender == male )
+		if ( (*(*i)).gender == genderEnum::male )
 		{
 
 		}
@@ -150,12 +129,17 @@ void GameState::ProcessDenizenActivity()
 	}
 }
 
+void GameState::ProcessDenizenStep(Denizen& person)
+{
+	person.Act(this->dayTimeSlot);
+}
+
 void GameState::DenizenSelectMate(Denizen * seeker)
 {
 	std::list<SocialNode>::iterator i;
 	switch ((*seeker).courtshipStyle)
 	{
-	case chaser:
+	case CourtshipStyle::chaser:
 		{
 		SocialNode* currentPartner = (*seeker).currentPartner;
 		SocialNode* potentialNewPartner = NULL;
@@ -174,25 +158,25 @@ void GameState::DenizenSelectMate(Denizen * seeker)
 		}
 		if (potentialNewPartner != NULL && potentialNewPartner != currentPartner)
 		{
-			requestResponse courtingResponse = (*(*potentialNewPartner).person).HearRequest(court, (*potentialNewPartner).ownerNode);
-			if (courtingResponse == yes)
+			requestResponse::requestResponse courtingResponse = (*(*potentialNewPartner).person).HearRequest(request::court, (*potentialNewPartner).ownerNode);
+			if (courtingResponse == requestResponse::yes)
 			{
 				if ((*seeker).currentPartner != NULL)
 				{
 					std::wstring relationshipEndMessage = (*seeker).shortName;
 					relationshipEndMessage.append(L" and ");
 					relationshipEndMessage.append((*(*(*seeker).currentPartner).person).shortName);
-					if ((*(*seeker).currentPartner).currentRelationship == married)
+					if ((*(*seeker).currentPartner).currentRelationship == RelationshipStatus::married)
 					{
 						relationshipEndMessage.append(L" got divorced");
 					}
-					else if ((*(*seeker).currentPartner).currentRelationship == courting)
+					else if ((*(*seeker).currentPartner).currentRelationship == RelationshipStatus::courting)
 					{
 						relationshipEndMessage.append(L" broke up");
 					}
 
-					(*seeker).ChangeRelationshipWithOther(ex, (*seeker).currentPartner);
-					(*(*(*seeker).currentPartner).person).ChangeRelationshipWithOther(ex, (*(*seeker).currentPartner).ownerNode);
+					(*seeker).ChangeRelationshipWithOther(RelationshipStatus::ex, (*seeker).currentPartner);
+					(*(*(*seeker).currentPartner).person).ChangeRelationshipWithOther(RelationshipStatus::ex, (*(*seeker).currentPartner).ownerNode);
 
 					(*(*(*seeker).currentPartner).person).currentPartner = NULL;
 					gameMessages.push_back(relationshipEndMessage);
@@ -202,17 +186,17 @@ void GameState::DenizenSelectMate(Denizen * seeker)
 					std::wstring relationshipEndMessage = (*(*potentialNewPartner).person).shortName;
 					relationshipEndMessage.append(L" and ");
 					relationshipEndMessage.append((*(*(*(*potentialNewPartner).person).currentPartner).person).shortName);
-					if ((*(*(*potentialNewPartner).person).currentPartner).currentRelationship == married)
+					if ((*(*(*potentialNewPartner).person).currentPartner).currentRelationship == RelationshipStatus::married)
 					{
 						relationshipEndMessage.append(L" got divorced");
 					}
-					else if ((*(*(*potentialNewPartner).person).currentPartner).currentRelationship == courting)
+					else if ((*(*(*potentialNewPartner).person).currentPartner).currentRelationship == RelationshipStatus::courting)
 					{
 						relationshipEndMessage.append(L" broke up");
 					}
 
-					(*(*potentialNewPartner).person).ChangeRelationshipWithOther(ex, (*(*potentialNewPartner).person).currentPartner);
-					(*(*(*(*potentialNewPartner).person).currentPartner).person).ChangeRelationshipWithOther(ex, (*(*(*potentialNewPartner).person).currentPartner).ownerNode);
+					(*(*potentialNewPartner).person).ChangeRelationshipWithOther(RelationshipStatus::ex, (*(*potentialNewPartner).person).currentPartner);
+					(*(*(*(*potentialNewPartner).person).currentPartner).person).ChangeRelationshipWithOther(RelationshipStatus::ex, (*(*(*potentialNewPartner).person).currentPartner).ownerNode);
 
 					(*(*(*(*potentialNewPartner).person).currentPartner).person).currentPartner = NULL;
 					gameMessages.push_back(relationshipEndMessage);
@@ -225,8 +209,8 @@ void GameState::DenizenSelectMate(Denizen * seeker)
 				(*seeker).currentPartner = potentialNewPartner;
 				(*(*potentialNewPartner).person).currentPartner = (*potentialNewPartner).ownerNode;
 
-				(*seeker).ChangeRelationshipWithOther(courting, potentialNewPartner);
-				(*(*potentialNewPartner).person).ChangeRelationshipWithOther(courting, (*potentialNewPartner).ownerNode);
+				(*seeker).ChangeRelationshipWithOther(RelationshipStatus::courting, potentialNewPartner);
+				(*(*potentialNewPartner).person).ChangeRelationshipWithOther(RelationshipStatus::courting, (*potentialNewPartner).ownerNode);
 
 
 				gameMessages.push_back(relationshipStartMessage);
@@ -234,13 +218,13 @@ void GameState::DenizenSelectMate(Denizen * seeker)
 		}
 		else if(currentPartner != NULL)
 		{
-			if ((*currentPartner).currentRelationship == courting && (*currentPartner).currentRelationshipAge >= 6 && (rand() % 3) == 0)
+			if ((*currentPartner).currentRelationship == RelationshipStatus::courting && (*currentPartner).currentRelationshipAge >= 6 && (rand() % 3) == 0)
 			{
-				requestResponse proposalResponse = (*(*currentPartner).person).HearRequest(marriage, (*currentPartner).ownerNode);
-				if (proposalResponse == yes)
+				requestResponse::requestResponse proposalResponse = (*(*currentPartner).person).HearRequest(request::marriage, (*currentPartner).ownerNode);
+				if (proposalResponse == requestResponse::yes)
 				{
-					(*seeker).ChangeRelationshipWithOther(married, currentPartner);
-					(*(*currentPartner).person).ChangeRelationshipWithOther(married, (*currentPartner).ownerNode);
+					(*seeker).ChangeRelationshipWithOther(RelationshipStatus::married, currentPartner);
+					(*(*currentPartner).person).ChangeRelationshipWithOther(RelationshipStatus::married, (*currentPartner).ownerNode);
 					std::wstring relationshipStartMessage = (*seeker).shortName;
 					relationshipStartMessage.append(L" and ");
 					relationshipStartMessage.append((*(*currentPartner).person).shortName);
@@ -249,13 +233,13 @@ void GameState::DenizenSelectMate(Denizen * seeker)
 					gameMessages.push_back(relationshipStartMessage);
 				}
 			}
-			else if ((*currentPartner).currentRelationship == married && (rand() % 2) == 0)
+			else if ((*currentPartner).currentRelationship == RelationshipStatus::married && (rand() % 2) == 0)
 			{
-				requestResponse loveResponse = (*(*currentPartner).person).HearRequest(copulate, (*currentPartner).ownerNode);
-				if (loveResponse == yes)
+				requestResponse::requestResponse loveResponse = (*(*currentPartner).person).HearRequest(request::copulate, (*currentPartner).ownerNode);
+				if (loveResponse == requestResponse::yes)
 				{
 					bool successfulFertilization = false;
-					if ((*seeker).gender == male)
+					if ((*seeker).gender == genderEnum::male)
 					{
 						successfulFertilization = (*(*(*seeker).currentPartner).person).TryHaveChildren(*seeker);
 					}
@@ -303,7 +287,7 @@ void GameState::GenerateFirstPeopleDemo()
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[1]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[7]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[8]));
-			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(male, L"Bobbo", 240, momgenes, dadgenes, &theLiving, 0, 0);
+			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(genderEnum::male, L"Bobbo", 240, momgenes, dadgenes, &theLiving, 0, 0);
 			BirthDenizen(&(*newPerson));
 			theLiving.push_back(std::move(newPerson));
 			break;
@@ -316,7 +300,7 @@ void GameState::GenerateFirstPeopleDemo()
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[2]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[6]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[0]));
-			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(female, L"Stephanie", 380, momgenes, dadgenes, &theLiving, 5, 0);
+			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(genderEnum::female, L"Stephanie", 380, momgenes, dadgenes, &theLiving, 5, 0);
 			BirthDenizen(&(*newPerson));
 			theLiving.push_back(std::move(newPerson));
 			break;
@@ -329,7 +313,7 @@ void GameState::GenerateFirstPeopleDemo()
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[5]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[7]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[8]));
-			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(male, L"Thomas", 300, momgenes, dadgenes, &theLiving, 0, 5);
+			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(genderEnum::male, L"Thomas", 300, momgenes, dadgenes, &theLiving, 0, 5);
 			BirthDenizen(&(*newPerson));
 			theLiving.push_back(std::move(newPerson));
 			break;
@@ -342,7 +326,7 @@ void GameState::GenerateFirstPeopleDemo()
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[2]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[7]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[0]));
-			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(female, L"Hannah", 220, momgenes, dadgenes, &theLiving, 5, 5);
+			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(genderEnum::female, L"Hannah", 220, momgenes, dadgenes, &theLiving, 5, 5);
 			BirthDenizen(&(*newPerson));
 			theLiving.push_back(std::move(newPerson));
 			break;
@@ -355,7 +339,7 @@ void GameState::GenerateFirstPeopleDemo()
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[3]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[7]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[8]));
-			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(male, L"Erick", 400, momgenes, dadgenes, &theLiving, 2, 8);
+			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(genderEnum::male, L"Erick", 400, momgenes, dadgenes, &theLiving, 2, 8);
 			BirthDenizen(&(*newPerson));
 			theLiving.push_back(std::move(newPerson));
 			break;
@@ -368,7 +352,7 @@ void GameState::GenerateFirstPeopleDemo()
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[2]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[7]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[0]));
-			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(female, L"Sarai", 290, momgenes, dadgenes, &theLiving, 2, 8);
+			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(genderEnum::female, L"Sarai", 290, momgenes, dadgenes, &theLiving, 2, 8);
 			BirthDenizen(&(*newPerson));
 			theLiving.push_back(std::move(newPerson));
 			break;
@@ -381,7 +365,7 @@ void GameState::GenerateFirstPeopleDemo()
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[2]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[7]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[8]));
-			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(male, L"Mortimer", 540, momgenes, dadgenes, &theLiving, 3, 6);
+			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(genderEnum::male, L"Mortimer", 540, momgenes, dadgenes, &theLiving, 3, 6);
 			BirthDenizen(&(*newPerson));
 			theLiving.push_back(std::move(newPerson));
 			break;
@@ -394,7 +378,7 @@ void GameState::GenerateFirstPeopleDemo()
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[2]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[6]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[0]));
-			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(female, L"Lena", 140, momgenes, dadgenes, &theLiving, 7, 7);
+			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(genderEnum::female, L"Lena", 140, momgenes, dadgenes, &theLiving, 7, 7);
 			BirthDenizen(&(*newPerson));
 			theLiving.push_back(std::move(newPerson));
 			break;
@@ -407,7 +391,7 @@ void GameState::GenerateFirstPeopleDemo()
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[2]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[6]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[8]));
-			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(male, L"Justin", 90, momgenes, dadgenes, &theLiving, 2, 10);
+			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(genderEnum::male, L"Justin", 90, momgenes, dadgenes, &theLiving, 2, 10);
 			BirthDenizen(&(*newPerson));
 			theLiving.push_back(std::move(newPerson));
 			break;
@@ -420,7 +404,7 @@ void GameState::GenerateFirstPeopleDemo()
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[5]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[7]));
 			dadgenes.push_back(&(*(*Biology::bio()).genepool[0]));
-			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(female, L"Barbara", 270, momgenes, dadgenes, &theLiving, 4, 10);
+			std::unique_ptr<Denizen> newPerson = std::make_unique<Denizen>(genderEnum::female, L"Barbara", 270, momgenes, dadgenes, &theLiving, 4, 10);
 			BirthDenizen(&(*newPerson));
 			theLiving.push_back(std::move(newPerson));
 			break;

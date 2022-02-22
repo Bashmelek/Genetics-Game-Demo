@@ -7,6 +7,7 @@
 #ifndef GAMEWINDEF
 #define GAMEWINDEF
 
+
 template <class GAME_WINDOW>
 class BaseWindow
 {
